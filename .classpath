@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="eu/mf2c/pm/security/BasicSSLSocketServer.java|eu/mf2c/pm/security/CertficateManager.java" kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="E:/common-libs/apache-log4j-1.2.16/apache-log4j-1.2.16/log4j-1.2.16.jar" sourcepath="E:/common-libs/apache-log4j-1.2.16/apache-log4j-1.2.16/src"/>
+	<classpathentry kind="lib" path="E:/common-libs/bouncyCastle/bcprov-jdk15on-159.jar" sourcepath="E:/common-libs/bouncyCastle/bctls-jdk15on-159/src">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/E:/common-libs/bouncyCastle/bctls-jdk15on-159/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="E:/common-libs/bouncyCastle/crypto-159/crypto-159/jars/jce-jdk13-159.jar" sourcepath="E:/common-libs/bouncyCastle/crypto-159/crypto-159/jce/src"/>
+	<classpathentry kind="lib" path="E:/common-libs/bouncyCastle/crypto-159/crypto-159/jars/jce-ext-jdk13-159.jar"/>
+	<classpathentry kind="lib" path="E:/common-libs/bouncyCastle/crypto-159/crypto-159/jars/bcpg-jdk15on-159.jar"/>
+	<classpathentry kind="lib" path="E:/common-libs/bouncyCastle/crypto-159/crypto-159/jars/bcpkix-jdk15on-159.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
