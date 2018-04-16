@@ -84,14 +84,16 @@ public class PMCertManager {
 	}*/
 	
 	/**
-	 * 
-	 * @throws StoreManagerSingletonException
+	 * Set up the keystore to hold the bundled certificates for use in SSL handshake.
+	 * It also trigger the creation of an RSA keypair.
+	 * <p>
+	 * @throws StoreManagerSingletonException	on creating the keystore or on loading the certificate PEMs.
 	 */
 	public void setupStoreManager() throws StoreManagerSingletonException {
-		StoreManagerSingleton sms = StoreManagerSingleton.getInstance(); //this creates the keystore
-		sms.loadPemFile("resource\00root.pem");
-		sms.loadPemFile("resource\01subca.pem");
-		sms.loadPemFile("resource\fog-sub.pem");		
+		//this creates the keystore, and loads the fog-sub, 01subca and 00root certificate PEMs.
+		StoreManagerSingleton sms = StoreManagerSingleton.getInstance(); 
+		//
+		sms.generateKeyPair();
 		//
 	}
 	

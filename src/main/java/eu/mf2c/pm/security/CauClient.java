@@ -15,20 +15,40 @@
  */
 package eu.mf2c.pm.security;
 
-import java.io.FileInputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.InetAddress;
-import java.security.KeyStore;
+import java.nio.charset.StandardCharsets;
+import java.security.Certificate;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 
-import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.HandshakeCompletedEvent;
+import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.apache.log4j.Logger;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import eu.mf2c.pm.security.Exception.CauClientException;
+import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
 import eu.mf2c.pm.security.util.Utils;
 
 /**
@@ -46,12 +66,15 @@ import eu.mf2c.pm.security.util.Utils;
  *
  */
 public class CauClient extends Thread {
+	
+	protected Logger LOGGER = Logger.getLogger(CauClient.class);
 	/** ssl context attribute */
 	private SSLContext sslContext = null;
 	/** ssl socket factory attribute */
 	private SSLSocketFactory sslFactory = null;
 	/** ssl socket object */
 	private SSLSocket socket = null;
+	/** The next four attributes are passed in as main arguments */
 	/** CAU IP attribute*/
 	private InetAddress cauIP = null;
 	/** CAU port attribute */
@@ -60,38 +83,44 @@ public class CauClient extends Thread {
 	private InetAddress leaderCauIP = null;
 	/** leader CAU port attribute */
 	private int leaderCauPort = 0;
-	
-	
+	/** the next four attributes are passed in by the discovery block */
+	/** lead agent ID attribute */
+	private String leaderID = null;
+	/** lead agent MAC address attribute */	
+	private String leaderMacAddr = null;
+	/** agent ID key */
+	private String idKey = null;
+	/** agent device ID */
+	private String deviceID = null;
+	/** StoreManagerSingle instance */
+	protected StoreManagerSingleton sms = StoreManagerSingleton.getInstance();
 	
 	/** properties cache */
 	//private HashMap<String, String> cache = null;
 	
-	
-	static SSLContext createSSLContext() throws Exception 
+	/**
+	 * Create an SSLContext object with a truststore.
+	 * The regional CAU should not require client authentifcation.
+	 * <p>
+	 * @return	the created SSLContext object
+	 * @throws Exception	on error
+	 */
+	private SSLContext createSSLContext() throws Exception 
 	    {
-	        // set up a key manager for our local credentials
-			KeyManagerFactory mgrFact = KeyManagerFactory.getInstance("SunX509");
-			KeyStore clientStore = KeyStore.getInstance("PKCS12");
-
-			clientStore.load(new FileInputStream("client.p12"), Utils.CLIENT_PASSWORD.toCharArray());
-
-			mgrFact.init(clientStore, Utils.CLIENT_PASSWORD.toCharArray());
-			
-			// set up a trust manager so we can recognize the server
-			TrustManagerFactory trustFact = TrustManagerFactory.getInstance("SunX509");
-			KeyStore            trustStore = KeyStore.getInstance("JKS");
-			
-			trustStore.load(new FileInputStream("trustStore.jks"), Utils.TRUST_STORE_PASSWORD.toCharArray());
-			
-			trustFact.init(trustStore);
-			
+			//Security.addProvider(new BouncyCastleProvider());		
+			// set up a key manager for our local credentials
+			 TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
+	                    TrustManagerFactory.getDefaultAlgorithm());
+	         trustManagerFactory.init(StoreManagerSingleton.getInstance().getTrustStore());
+	         //we are doing one way authentication - authenticating server certificate
+	         //			
 			// create a context and set up a socket factory
-			SSLContext sslContext = SSLContext.getInstance("TLS");
-
-			sslContext.init(mgrFact.getKeyManagers(), trustFact.getTrustManagers(), null);
+			SSLContext sslContext = SSLContext.getInstance("TLS"); //1.2 default
+			sslContext.init(null, trustManagerFactory.getTrustManagers(), null); //just 1 way 			
 
 			return sslContext;
 	    }
+	
 	/**
 	 * Construct an instance.
 	 * <p>
@@ -110,29 +139,172 @@ public class CauClient extends Thread {
 		if(cache.get("leaderCauIP").contains(":")) {
 			this.leaderCauPort = Utils.getPortNum(cache.get("leaderCauIP"));
 		}
-		//create the socket now
-		this.sslContext = createSSLContext();
-		this.sslFactory = this.sslContext.getSocketFactory();
-		this.socket = (SSLSocket) this.sslFactory.createSocket(this.cauIP, this.cauPort);
+		this.idKey = cache.get("idKey");
+		this.leaderMacAddr = cache.get("leaderMacAddr");
+		this.deviceID = cache.get("deviceID");
+		this.leaderID = cache.get("leaderID");
+		//this.createSSLContext();
+		
 	}
 
 	@Override
 	public void run() {
+		OutputStream out = null;
+		BufferedInputStream in = null;
 		//
-		//load PEM files
-		//establish TLS connection, validate server cert returned using intermediate and CA certs
-		//generate RSA keypair and CSR
-		//send CSR, block until cert is returned
-		//validate the returned cert using fogCA and CA certs
-		//handshake with leader CAU, cache the leader's server cert
-		//create rest client to trigger categorisation
+		try {
+			//create the socket now
+			this.sslContext = createSSLContext();
+			this.sslFactory = this.sslContext.getSocketFactory();
+			//we block for comm with cau, so no time out
+			this.socket = (SSLSocket) this.sslFactory.createSocket(this.cauIP, this.cauPort);
+			//for debugging, can be disabled
+			//this.logSocketInfo();
+			//add listener to capture server certificate
+			this.socket.addHandshakeCompletedListener(new SimpleHandShakeCompletedListener("cau"));
+			this.socket.startHandshake(); 
+			//should be OK to message now
+			String csrString = null; 
+			csrString = sms.createCSRString(); //CN = idKey
+			//CSR=,leaderID=;leaderMacAddr=;idKey=;deviceId=
+			byte[] msgBytes = getMsgBytes(csrString);
+			out = this.socket.getOutputStream();
+			//
+			out.write(msgBytes);			
+			//wait for response, should be the signed certificate object
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			in = new BufferedInputStream(this.socket.getInputStream());
+			// Create buffer: typical cert is about 2KB, not sure about underlying capability, use a small buffer
+			byte[] buffer = new byte[1024]; //
+			int bytesRead = 0;
+			while ((bytesRead = in.read(buffer, 0, 1024)) != -1) {
+				baos.write(buffer, 0, bytesRead);
+			}
+			baos.flush();
+			this.socket.close();
+			//needs to base64 decode
+			String certStr = new String(Base64.getDecoder().decode(baos.toByteArray()), StandardCharsets.UTF_8);
+			//generate the certificate
+			X509Certificate agentCert = sms.generateCertFromBytes(certStr.getBytes());
+			//validate certificate, just a simple check for the moment
+			LOGGER.info("agent certificate dn: " + agentCert.getSubjectX500Principal().getName());
+			//store to keystore
+			sms.storeKeyEntry(this.idKey, this.leaderID, agentCert);//using leaderId as the fogId for IT1 demo
+			//now verify certificate with leader agent's cau (basically an TLS handshake)
+			LeadAgentCauClient leaderClient = new LeadAgentCauClient(sms, this.idKey, this.leaderCauIP, this.leaderCauPort); //may throw exceptions on instantiation
+		    leaderClient.start();
+			//control passes over the the leader client, it will trigger the categorisation if the handshake with
+		    //the leader CAU is OK
+			
+		} catch (Exception e) {
+			 String msg = "Error running cau socket client: " + e.getMessage();
+			 LOGGER.error(msg);
+			 Thread thread = Thread.currentThread();
+             thread.getUncaughtExceptionHandler().uncaughtException(thread, new CauClientException(msg));
+		} finally{
+			try {
+				in.close();
+				out.close();
+				
+			} catch (IOException e) {
+				// Too bad
+				LOGGER.error("failed to release resources : " + e.getMessage());
+			}
+		}		
+	} 
 		
 		
 		
 		
-		
+	
+	/**
+	 * Create the request message for the local CAU
+	 * <p>
+	 * @param csrString		A {@link java.lang.String <em>String</em>} representation of the CSR.
+	 * @return	A {@link java.lang.byte <em>byte</em>} array representation of the messgae.
+	 */
+	private byte[] getMsgBytes(String csrString) {
+		//
+		String l_deviceId = "deviceId=" + this.deviceID;
+		String l_leaderId = "leaderId=" + this.leaderID;
+		String l_leaderMacAddr = "leaderMacAddr=" + this.leaderMacAddr;
+		String l_idKey = "idKey=" + this.idKey;
+		//
+		return Base64.getEncoder().encode(("csr=" + csrString + ";" + l_leaderId + ";" + l_leaderMacAddr + ";" + l_idKey + ";" + l_deviceId).getBytes());		
 	}
+	/**
+	 * Print properties of the client socket for debug purposes.
+	 */
+	private void logSocketInfo() {
+	     LOGGER.debug("   Remote address = " + this.socket.getInetAddress().toString());
+	     LOGGER.debug("   Remote port = "+ this.socket.getPort());
+	     LOGGER.debug("   Local socket address = " + this.socket.getLocalSocketAddress().toString());
+	     LOGGER.debug("   Local address = " + this.socket.getLocalAddress().toString());
+	     LOGGER.debug("   Local port = "+ this.socket.getLocalPort());
+	     LOGGER.debug("   Need client authentication = " + this.socket.getNeedClientAuth());
+	     LOGGER.debug("SSL protocol used: " + sslContext.getProtocol());
+		 LOGGER.debug("Enabled cipher suites: " + Arrays.toString(this.socket.getEnabledCipherSuites()));
+	}
+	/**
+	 * Print properties of the active session for debug purposes.
+	 */
+	private void logSesisonInfo(SSLSession session) {
+		try {
+			java.security.cert.Certificate[] cchain = session.getPeerCertificates();
+		    LOGGER.debug("The Certificates used by peer");
+		    for (int i = 0; i < cchain.length; i++) {
+		      LOGGER.debug(((X509Certificate) cchain[i]).getSubjectDN());
+		    }					
+		} catch (SSLPeerUnverifiedException e) {
+			LOGGER.error("Error retriving certificates from SSLSession object! : " + e.getMessage());
+		}
+		    LOGGER.debug("Peer host is " + session.getPeerHost());
+		    LOGGER.debug("Cipher is " + session.getCipherSuite());
+		    LOGGER.debug("Protocol is " + session.getProtocol());
+		    LOGGER.debug("ID is " + new BigInteger(session.getId()));
+		    LOGGER.debug("Session created in " + session.getCreationTime());
+		    LOGGER.debug("Session accessed in " + session.getLastAccessedTime());
+	}
+	/**
+	 * Listener to capture the server certificate and load this into the trust store
+	 * managed by the {@link StoreManagerSingleton <em>StoreManagerSingleton</em>}.
+	 * <p>
+	 * @author Shirley Crompton
+	 * @email  shirley.crompton@stfc.ac.uk
+	 * @org Data Science and Technology Group,
+	 *      UKRI Science and Technology Council
+	 * @Created 13 Apr 2018
+	 * <p>
+	 */
+	class SimpleHandShakeCompletedListener implements HandshakeCompletedListener{
+		//:TODO extract this out as an independent class in next iteration!!!!!
+		/** server name attribute, the name will be used as the truststore alias */
+		private String server = null;
+		/**
+		 * Constructor 
+		 * <p>
+		 * @param serverName 	Name of the server involved in the handshaking process.  
+		 */
+		public SimpleHandShakeCompletedListener(String serverName) {
+			this.server = serverName;
+		}
 
-	    
+		@Override
+		public void handshakeCompleted(HandshakeCompletedEvent event) {
+			try {
+				//LOGGER.debug("\n Inside handshakecompleted listener...");
+				X509Certificate cert= (X509Certificate) event.getPeerCertificates()[0]; 
+				String peer = cert.getSubjectDN().getName(); 
+				LOGGER.debug("\n DN from " + server + " : " + peer);
+				sms.storeCertificate(server, cert);
+			} catch (SSLPeerUnverifiedException pue) { 
+				LOGGER.error(server + " certificate unverified: " + pue.getMessage());
+			} catch (StoreManagerSingletonException e) {
+				// 
+				LOGGER.error("error storing cau certificate: " + e.getMessage());
+			}
+		}
+		
+	}    
 
 }

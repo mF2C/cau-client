@@ -52,8 +52,8 @@ public class Utils {
 	/**
 	 * Utility method to extract the ip address and port number from the input String.
 	 * <p>
-	 * @param input	A textural representation of the ip address and optional port number.
-	 * @return	a HashMap containing the converted InetAddress representation of the ip and 
+	 * @param input	A textual representation of the IP address and optional port number.
+	 * @return	a HashMap containing the converted InetAddress representation of the IP and 
 	 * 			an integer representation of the port number
 	 * @throws UnknownHostException 	on processing error.
 	 */
@@ -262,35 +262,4 @@ public class Utils {
         
         return bytes;
     }
-    /**
-     * Create a random 2048 bit RSA key pair
-     * <p>
-     * @return 	the generated RSA keypair
-     */
-    public static KeyPair generateRSAKeyPair()
-        throws Exception
-	{
-        KeyPairGenerator  kpGen = KeyPairGenerator.getInstance("RSA", "BC");
-    
-        kpGen.initialize(2048, new SecureRandom());
-    
-        return kpGen.generateKeyPair();
-	}
-    /**
-     * Load the mF2C root trust certificate file distributed with the application
-     * and use that to build a X509Certificate object.
-     * <p>
-     * @return  the X509 certificate object. 
-     */
-    public static X509Certificate getCAca() {
-    	
-    	
-    	
-    	
-    	
-    	return null;    	
-    }
-    
-    
-
 }

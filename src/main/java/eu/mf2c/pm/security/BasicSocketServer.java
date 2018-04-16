@@ -66,7 +66,7 @@ public class BasicSocketServer {
      * @param hm 	A {@link java.util.HashMap <em>HashMap</em>} representations of the CAU IP addresses.
      */
     public BasicSocketServer(HashMap<String, String> hm) {
-    	this.cache.putAll(hm);; //store a ref to the parent
+    	this.cache.putAll(hm);; //store the leaderCAU and regionalCAU connection params
     }
     
     
@@ -86,7 +86,7 @@ public class BasicSocketServer {
             	shutdown(); //JVM will always close socket and streams anyway
                 LOGGER.info("The basic socket server is shutting down!");
                 System.out.print("The basic socket server is shutting down.....");
-                StoreManagerSingleton.getInstance().persistKeyStore();
+                StoreManagerSingleton.getInstance().persistKeyStores();
                 //
             } catch (IOException | StoreManagerSingletonException e) { /* failed */ 
             	LOGGER.error("Error shutting down socket: " + e.getMessage());
@@ -133,7 +133,7 @@ public class BasicSocketServer {
      */
     private void getValues(String message) throws BasicSocketServerException {
     	//tokenise message
-    	//E.g.: leaderID=ablcidek1234;LeaderMacAddr=00-14-22-01-23-45;idKey=12345678-1234-5678-1234-567812345678;deviceId=00-14-22-01-23-45
+    	//E.g.: leaderID=ablcidek1234;leaderMacAddr=00-14-22-01-23-45;idKey=12345678-1234-5678-1234-567812345678;deviceId=00-14-22-01-23-45
     	String[] msgList = message.split(";");
     	for (String entry : msgList) {
     		  String[] keyValue = entry.split("=");
