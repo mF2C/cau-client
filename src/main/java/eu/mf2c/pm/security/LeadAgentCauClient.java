@@ -77,9 +77,9 @@ public class LeadAgentCauClient extends Thread {
 	 */
 	/** agent ID key, which is used as the keystore entry alias */
 	private String idKey = null;
-	/**
-	 * agent device ID private String deviceID = null;
-	 */
+	/** agent device ID */
+	private String deviceID = null;
+	 
 	/** StoreManagerSingle instance */
 	protected StoreManagerSingleton sms;
 
@@ -95,14 +95,15 @@ public class LeadAgentCauClient extends Thread {
 	 *            the leader CAU InetAddress
 	 * @param port
 	 *            the leader CAU port number
-	 * @throws Exception
+	 * @param deviceID	the agent&#39;s device id 	
+	 * 			  
 	 */
-	public LeadAgentCauClient(StoreManagerSingleton storeManager, String alias, InetAddress ip, int port)
-			throws Exception {
+	public LeadAgentCauClient(StoreManagerSingleton storeManager, String alias, InetAddress ip, int port, String deviceID) {
 		this.sms = storeManager;
 		this.idKey = alias;
 		this.leaderCauIP = ip;
 		this.leaderCauPort = port;
+		this.deviceID = deviceID;
 		// this.createSSLContext();
 	}
 
@@ -120,7 +121,7 @@ public class LeadAgentCauClient extends Thread {
 		// set up a key manager for our local credentials
 		TrustManagerFactory trustManagerFactory = TrustManagerFactory
 				.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		trustManagerFactory.init(StoreManagerSingleton.getInstance().getTrustStore());
+		trustManagerFactory.init(sms.getTrustStore());
 		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		keyManagerFactory.init(sms.getKeyStore(), sms.getStorePass().toCharArray());
 		// create a context and set up a socket factory
@@ -130,11 +131,12 @@ public class LeadAgentCauClient extends Thread {
 
 		return sslContext;
 	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void run() {
 		OutputStream out = null;
-		BufferedInputStream in = null;
 		//
 		try {
 			// create the socket now
@@ -154,7 +156,7 @@ public class LeadAgentCauClient extends Thread {
 			String msg = "Error running leadAgentCau socket client: " + e.getMessage();
 			LOGGER.error(msg);
 			Thread thread = Thread.currentThread();
-			thread.getUncaughtExceptionHandler().uncaughtException(thread, new CauClientException(msg));
+			thread.getUncaughtExceptionHandler().uncaughtException(thread, new CauClientException(msg)); //could have own exception class
 		} finally {
 			try {
 				out.close();
@@ -164,12 +166,9 @@ public class LeadAgentCauClient extends Thread {
 			}
 		}
 		// create rest client to trigger categorisation
-		
-		
-		
-		
-		
-
+		HttpURLClient httpClient = new HttpURLClient(this.deviceID, this.idKey); 
+		httpClient.start();
+		//control passing over the the httpClient which trigger the categorisation block which is the last required action
 	}
 
 	/**

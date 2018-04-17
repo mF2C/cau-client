@@ -111,7 +111,7 @@ public class CauClient extends Thread {
 			// set up a key manager for our local credentials
 			 TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
 	                    TrustManagerFactory.getDefaultAlgorithm());
-	         trustManagerFactory.init(StoreManagerSingleton.getInstance().getTrustStore());
+	         trustManagerFactory.init(sms.getTrustStore());
 	         //we are doing one way authentication - authenticating server certificate
 	         //			
 			// create a context and set up a socket factory
@@ -146,7 +146,9 @@ public class CauClient extends Thread {
 		//this.createSSLContext();
 		
 	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void run() {
 		OutputStream out = null;
@@ -178,20 +180,20 @@ public class CauClient extends Thread {
 			byte[] buffer = new byte[1024]; //
 			int bytesRead = 0;
 			while ((bytesRead = in.read(buffer, 0, 1024)) != -1) {
-				baos.write(buffer, 0, bytesRead);
+				baos.write(buffer, 0, bytesRead); //keep adding to the buffer
 			}
 			baos.flush();
 			this.socket.close();
 			//needs to base64 decode
 			String certStr = new String(Base64.getDecoder().decode(baos.toByteArray()), StandardCharsets.UTF_8);
-			//generate the certificate
+			//generate the certificate with the UTF8 String
 			X509Certificate agentCert = sms.generateCertFromBytes(certStr.getBytes());
 			//validate certificate, just a simple check for the moment
 			LOGGER.info("agent certificate dn: " + agentCert.getSubjectX500Principal().getName());
 			//store to keystore
 			sms.storeKeyEntry(this.idKey, this.leaderID, agentCert);//using leaderId as the fogId for IT1 demo
 			//now verify certificate with leader agent's cau (basically an TLS handshake)
-			LeadAgentCauClient leaderClient = new LeadAgentCauClient(sms, this.idKey, this.leaderCauIP, this.leaderCauPort); //may throw exceptions on instantiation
+			LeadAgentCauClient leaderClient = new LeadAgentCauClient(sms, this.idKey, this.leaderCauIP, this.leaderCauPort, this.deviceID); //may throw exceptions on instantiation
 		    leaderClient.start();
 			//control passes over the the leader client, it will trigger the categorisation if the handshake with
 		    //the leader CAU is OK
@@ -277,7 +279,7 @@ public class CauClient extends Thread {
 	 * <p>
 	 */
 	class SimpleHandShakeCompletedListener implements HandshakeCompletedListener{
-		//:TODO extract this out as an independent class in next iteration!!!!!
+		//:TODO extract this out as an independent class in next iteration or make it annonymous
 		/** server name attribute, the name will be used as the truststore alias */
 		private String server = null;
 		/**
