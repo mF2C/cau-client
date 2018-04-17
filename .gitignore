@@ -7,3 +7,5 @@ log/
 target/
 
 /bin/
+
+src/main/resources/cau.key.pem
