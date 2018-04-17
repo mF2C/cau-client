@@ -6,6 +6,10 @@
 log/
 target/
 
+<<<<<<< HEAD
 /bin/
 
 src/main/resources/cau.key.pem
+=======
+/bin/
+>>>>>>> 56f8b225d40106196b4857bb9085865653a52942
