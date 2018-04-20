@@ -4,7 +4,7 @@
 .settings/
 
 log/
-target/
+#target/
 src/main/resources/cau.key.pem
 
 
