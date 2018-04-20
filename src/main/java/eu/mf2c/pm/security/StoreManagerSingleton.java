@@ -16,22 +16,20 @@
 package eu.mf2c.pm.security;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.SecureRandom;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStore.ProtectionParameter;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -71,7 +69,9 @@ public class StoreManagerSingleton {
 	/** An instance of the class */
 	private static StoreManagerSingleton instance = null;
 	/** A password String to protected the keystore */
-	private static final String STOREPASS = "stfc-mf2c-trust"+Instant.now().getNano(); 
+	private static final String STOREPASS = "stfc-mf2c-trust"+Instant.now().getNano();
+	/** A password String to protected the truststore */
+	private static final String TRUSTPASS = "changeit";
 	/** A password String to protected the key entry */
 	private static final String KEYPASS = "stfc-mf2c-key"; //appended with the fog-id
 	/** A JKS keystore for private credentials */
@@ -138,27 +138,31 @@ public class StoreManagerSingleton {
 	 * @return the password
 	 */
 	public String getStorePass() {
-		return this.STOREPASS;
+		return STOREPASS;
 	}
 	/**
-	 * Load a X.509 certificate from file.
+	 * Load a X.509 certificate from the provided input stream
 	 * <p>
-	 * @param	relative path to the file
+	 * @param inStream 	an input stream to the PEM file
 	 * @return	the generated X.509 certificate or null if there is an error.
 	 */
-	public X509Certificate generateCertfromPEM(String path) {
+	public X509Certificate generateCertfromPEM(InputStream inStream) {
 		X509Certificate ca = null;
-		//"resource\\X509.pem"
-		try (FileInputStream inStream = new FileInputStream(new File(path))) {
+		//
+		try {
 	        CertificateFactory cf = CertificateFactory.getInstance("X.509");
 			//
 			ca = (X509Certificate) cf.generateCertificate(inStream);
 		} catch (CertificateException e) {
 			// 
-			LOGGER.error("CertificateException generating certificate from file("+ path + ") : " + e.getMessage());
-		} catch (IOException e) {
-			// 
-			LOGGER.error("IOException generating certificate from file("+ path + ") : " + e.getMessage());
+			LOGGER.error("CertificateException generating certificate from file: " + e.getMessage());
+		} finally{
+			try {
+				inStream.close();
+			}catch (IOException e) {
+				//too bad
+				LOGGER.error("IOException generating certificate from file: " + e.getMessage());
+			}
 		}
         return ca;
 		
@@ -288,15 +292,16 @@ public class StoreManagerSingleton {
 			trustStore = KeyStore.getInstance("JKS");		
 		    if (file.exists()) {
 		        // if exists, load		        
-				trustStore.load(new FileInputStream(file), null);
+				trustStore.load(new FileInputStream(file), TRUSTPASS.toCharArray());
 		    } else {
-		        // if not exists, create
-		        trustStore.load(null, null); //initialise
-		        trustStore.store(new FileOutputStream(file), null);
-		    }
-		    storeCertificate("fog-sub",generateCertfromPEM("resources/fog-sub.pem"));
-		    storeCertificate("01subca",generateCertfromPEM("resources/01subca.pem"));
-		    storeCertificate("00root",generateCertfromPEM("resources/00root.pem"));
+		        // if not exists, create it
+		    	LOGGER.debug("Creating the new truststore(" + CACERT_PATH + ")");
+		        trustStore.load(null, TRUSTPASS.toCharArray()); //initialise
+		        trustStore.store(new FileOutputStream(file), TRUSTPASS.toCharArray());
+		    }		  
+		    storeCertificate("fog-sub",generateCertfromPEM(this.getClass().getResourceAsStream("/fog-sub.pem")));
+		    storeCertificate("01subca",generateCertfromPEM(this.getClass().getResourceAsStream("/01subca.pem")));
+		    storeCertificate("00root",generateCertfromPEM(this.getClass().getResourceAsStream("/00root.pem")));
 		    
 		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
 			LOGGER.error("Error writing keystore file : " + e.getMessage());
@@ -318,7 +323,8 @@ public class StoreManagerSingleton {
 		        // if exists, load		        
 				keyStore.load(new FileInputStream(file), STOREPASS.toCharArray());
 		    } else {
-		        // if not exists, create
+		        // if not exists, create it
+		    	LOGGER.debug("Creating the new Keystore(" + STORE_PATH + ")");
 		        keyStore.load(null, STOREPASS.toCharArray()); //initialise
 		        keyStore.store(new FileOutputStream(file), STOREPASS.toCharArray());
 		    }
@@ -353,7 +359,7 @@ public class StoreManagerSingleton {
 	}
 	/**
 	 * Generate a CSR, get a {@link java.lang.String <em>String</em>} representation of it.
-	 * ,p>
+	 * <p>
 	 * @return	a {@link java.lang.String <em>String</em>} representation of the CSR.
 	 * @throws StoreManagerSingletonException on processing error.
 	 */

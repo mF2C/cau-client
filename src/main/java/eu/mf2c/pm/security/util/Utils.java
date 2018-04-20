@@ -17,12 +17,9 @@ package eu.mf2c.pm.security.util;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 
 /**
@@ -154,7 +151,9 @@ public class Utils {
      */
 	private static class FixedRand extends SecureRandom
     {
-        MessageDigest	sha;
+        /** version UID attribute */
+		private static final long serialVersionUID = 1L;
+		MessageDigest	sha;
         byte[]			state;
         
         FixedRand()

@@ -16,20 +16,12 @@
 package eu.mf2c.pm.security;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
-import java.security.Certificate;
-import java.security.KeyStoreException;
-import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Base64;
@@ -45,7 +37,6 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import eu.mf2c.pm.security.Exception.CauClientException;
 import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
@@ -184,6 +175,12 @@ public class CauClient extends Thread {
 			}
 			baos.flush();
 			this.socket.close();
+			
+			/********************
+			 
+			  :TODO Not sure if CAU is going to return a certificate chain or just the signed certificate
+			
+			*********************/
 			//needs to base64 decode
 			String certStr = new String(Base64.getDecoder().decode(baos.toByteArray()), StandardCharsets.UTF_8);
 			//generate the certificate with the UTF8 String

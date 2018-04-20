@@ -15,14 +15,10 @@
  */
 package eu.mf2c.pm.security;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
@@ -35,7 +31,6 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.log4j.Logger;
 
-import eu.mf2c.pm.security.CauClient.SimpleHandShakeCompletedListener;
 import eu.mf2c.pm.security.Exception.CauClientException;
 import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
 
@@ -165,10 +160,12 @@ public class LeadAgentCauClient extends Thread {
 				LOGGER.error("failed to release resources : " + e.getMessage());
 			}
 		}
+		/********19Apr18 UPC has changed the interaction, policy block now does this 
 		// create rest client to trigger categorisation
 		HttpURLClient httpClient = new HttpURLClient(this.deviceID, this.idKey); 
 		httpClient.start();
 		//control passing over the the httpClient which trigger the categorisation block which is the last required action
+		 *************************************************************/
 	}
 
 	/**

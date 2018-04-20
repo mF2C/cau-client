@@ -15,15 +15,10 @@
  */
 package eu.mf2c.pm.security;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-import eu.mf2c.pm.security.Exception.BasicSocketServerException;
-import eu.mf2c.pm.security.Exception.PMCertManagerException;
 import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
 
 /**
@@ -110,10 +105,10 @@ public class PMCertManager {
 	 */
 	public static void main(String[] args) throws Exception {
 		if (args.length < 2) {
-			throw new RuntimeException("Usage: PMCertManager <CauIP[:port number]> <LeaderCauIP[:port number]>");
+			throw new RuntimeException("Usage: PMCertManager <CauIP:port number> <LeaderCauIP:port number>");
 		}
 		if(args[0].isEmpty() || args[1].isEmpty()) {
-			throw new RuntimeException("Usage: PMCertManager <CauIP[:port number]> <LeaderCauIP[:port number]>");
+			throw new RuntimeException("Usage: PMCertManager <CauIP:port number> <LeaderCauIP:port number>");
 		}
 		PMCertManager pmCM = new PMCertManager(); //instantiate class
 		//cache the values now
