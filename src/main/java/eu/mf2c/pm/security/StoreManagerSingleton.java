@@ -203,7 +203,7 @@ public class StoreManagerSingleton {
 				file.createNewFile();
 			}
 			//file is appended to if exist
-		    trustStore.store(new FileOutputStream(file), null);
+		    trustStore.store(new FileOutputStream(file), TRUSTPASS.toCharArray());
 		    //keyStore
 		    if(keyStore.size() < 1) {
 				LOGGER.info("No entries in the keyStore, aborting writing to file.");
