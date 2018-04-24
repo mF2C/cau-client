@@ -77,7 +77,8 @@ public class BasicSocketServer {
      */
     public void runSocket() throws Exception {
     	//no thread here, as we only needs to listen to discovery block
-        s = new ServerSocket(0 , 2, InetAddress.getByName("127.0.0.1")); //auto port n#, max 2 connections, local host
+        //s = new ServerSocket(0 , 2, InetAddress.getByName("127.0.0.1")); //auto port n#, max 2 connections, local host
+    	s = new ServerSocket(46065 , 2, InetAddress.getByName("127.0.0.1")); //IT1 fixed port n#, max 2 connections, local host 23Apr18
         //add a shutdown hook for when user terminates JVM
         Runtime.getRuntime().addShutdownHook(new Thread(){public void run(){
             try {

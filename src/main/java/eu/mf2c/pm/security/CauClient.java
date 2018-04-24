@@ -69,11 +69,11 @@ public class CauClient extends Thread {
 	/** CAU IP attribute*/
 	private InetAddress cauIP = null;
 	/** CAU port attribute */
-	private int cauPort = 0;
+	private int cauPort = 46400; //default for IT1
 	/** leader CAU IP attribute*/
 	private InetAddress leaderCauIP = null;
 	/** leader CAU port attribute */
-	private int leaderCauPort = 0;
+	private int leaderCauPort = 46401; //default for IT1
 	/** the next four attributes are passed in by the discovery block */
 	/** lead agent ID attribute */
 	private String leaderID = null;
