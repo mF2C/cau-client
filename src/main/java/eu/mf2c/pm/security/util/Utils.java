@@ -17,32 +17,28 @@ package eu.mf2c.pm.security.util;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.HashMap;
 
 /**
  * Miscellaneous utility functions.
  * Some functions are based on third parties code
  * <p>
- * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
- *      UKRI Science and Technology Council
- * @Created 5 Apr 2018
+ * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
+ *     UKRI Science and Technology Council
+ * Date 5 Apr 2018
  *
  */
 public class Utils {	
 	
 	/** Default String value */
 	private static String	digits = "0123456789abcdef";
-	/* certificate password */
+	/* certificate password 
 	public static char[] KEY_PASSWD = "keyPassword".toCharArray();
-	/** keystore password */
+	/** keystore password 
 	public static String CLIENT_PASSWORD = "mf2c-client";
-	/** truststore password */
-	public static String TRUST_STORE_PASSWORD = "mf2c-trust";
+	/** truststore password /
+	public static String TRUST_STORE_PASSWORD = "mf2c-trust";*/
 	
     
 	
@@ -148,10 +144,10 @@ public class Utils {
     }
     /**
      * Inner class representing a fixed length random number.
-     */
+     
 	private static class FixedRand extends SecureRandom
     {
-        /** version UID attribute */
+        /** version UID attribute 
 		private static final long serialVersionUID = 1L;
 		MessageDigest	sha;
         byte[]			state;
@@ -167,12 +163,12 @@ public class Utils {
             {
                 throw new RuntimeException("can't find SHA-1!");
             }
-        }
+        }*/
         /**
          * Generates a user-specified number of random bytes.
          * <p>
          * @param bytes 	bytes array object input
-         */
+         
 	    public void nextBytes(
 	       byte[] bytes)
 	    {
@@ -198,16 +194,16 @@ public class Utils {
 	            sha.update(state);
 	        }
 	    }
-    }
+    }*/
     
     /**
      * Return a SecureRandom which produces the same value.
      * @return a fixed random
-     */
+     
     public static SecureRandom createFixedRandom()
     {
         return new FixedRand();
-    }
+    }*/
     /**
      * Convert a byte array of 8 bit characters into a String.
      * 

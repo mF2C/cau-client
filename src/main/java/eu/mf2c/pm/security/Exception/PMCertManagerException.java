@@ -17,11 +17,10 @@ package eu.mf2c.pm.security.Exception;
 /**
  * Errors associated with the {@link eu.mf2c.pm.security.PMCertManager <em>PMCertManager</em>} object.
  * <p>
- * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
- *      UKRI Science and Technology Council
- * @Created 6 April 2018
+ * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
+ *     UKRI Science and Technology Council
+ * Date 6 April 2018
  *
  */
 public class PMCertManagerException extends Exception {

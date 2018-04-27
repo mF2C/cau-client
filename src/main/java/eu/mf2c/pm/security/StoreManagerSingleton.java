@@ -56,11 +56,10 @@ import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
  * A singleton class responsible for the trust and key stores.  
  * On application close down, the stores are written to a local file.
  * <p>
- * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
- *      UKRI Science and Technology Council
- * @Created 10 Apr 2018
+ * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
+ *     UKRI Science and Technology Council
+ * Date 10 Apr 2018
  */
 public class StoreManagerSingleton {
 	
@@ -96,7 +95,7 @@ public class StoreManagerSingleton {
 	
 	/** 
 	 * private constructor 
-	 * @throws StoreManagerSingletonException 
+	 * @throws StoreManagerSingletonException on error
 	 * */
 	private StoreManagerSingleton() throws StoreManagerSingletonException{		
 			createTrustStore();
@@ -337,6 +336,7 @@ public class StoreManagerSingleton {
 	 * Generate a PKCS10 Certification Request.
 	 * <p>
 	 * @return the generated request object.
+	 * @throws StoreManagerSingletonException on processing errors
 	 */
 	public PKCS10CertificationRequest createCSR() throws StoreManagerSingletonException{
 		PKCS10CertificationRequest csr = null;

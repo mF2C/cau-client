@@ -49,11 +49,10 @@ import eu.mf2c.pm.security.util.Utils;
  * Then it calls the Categorisation block via REST to trigger the agent categorisation
  * process.
  * <p>
- * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
- *      UKRI Science and Technology Council
- * @Created 5 Apr 2018
+ * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
+ *     UKRI Science and Technology Council
+ * Date 5 Apr 2018
  *
  */
 public class CauClient extends Thread {
@@ -220,7 +219,7 @@ public class CauClient extends Thread {
 	 * Create the request message for the local CAU
 	 * <p>
 	 * @param csrString		A {@link java.lang.String <em>String</em>} representation of the CSR.
-	 * @return	A {@link java.lang.byte <em>byte</em>} array representation of the messgae.
+	 * @return	A byte array representation of the message.
 	 */
 	private byte[] getMsgBytes(String csrString) {
 		//
@@ -246,6 +245,8 @@ public class CauClient extends Thread {
 	}
 	/**
 	 * Print properties of the active session for debug purposes.
+	 * <p>
+	 * @param session the current session object
 	 */
 	private void logSesisonInfo(SSLSession session) {
 		try {
@@ -268,12 +269,10 @@ public class CauClient extends Thread {
 	 * Listener to capture the server certificate and load this into the trust store
 	 * managed by the {@link StoreManagerSingleton <em>StoreManagerSingleton</em>}.
 	 * <p>
-	 * @author Shirley Crompton
-	 * @email  shirley.crompton@stfc.ac.uk
-	 * @org Data Science and Technology Group,
-	 *      UKRI Science and Technology Council
-	 * @Created 13 Apr 2018
-	 * <p>
+	 * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
+	 * org Data Science and Technology Group,
+	 *     UKRI Science and Technology Council
+	 * Date 13 Apr 2018
 	 */
 	class SimpleHandShakeCompletedListener implements HandshakeCompletedListener{
 		//:TODO extract this out as an independent class in next iteration or make it annonymous

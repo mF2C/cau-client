@@ -39,12 +39,10 @@ import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
  * <li>Identity block sending device identity info</li>
  * </ul> * 
  * <p>
- * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
- *      UKRI Science and Technology Council
- * @Created 6 Apr 2018
- * <p>
+ * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
+ *     UKRI Science and Technology Council
+ * Date 6 Apr 2018
  */
 public class BasicSocketServer {
 	/** Message logger attribute */
@@ -73,7 +71,7 @@ public class BasicSocketServer {
      * trigger from the Discovery block and receive the required
      * identity and leader information.
      * <p> 
-     * @throws Exception 
+     * @throws Exception on processing errors
      */
     public void runSocket() throws Exception {
     	//no thread here, as we only needs to listen to discovery block
@@ -127,8 +125,8 @@ public class BasicSocketServer {
      * values.  The message contains values which are represented 
      * as key&#45;value pairs, with each pair separated by a &#39;,&#39; 
      * <p>
-     * @param message
-     * @throws BasicSocketServerException 
+     * @param message  incoming message
+     * @throws BasicSocketServerException on errors
      */
     private void getValues(String message) throws BasicSocketServerException {
     	//tokenise message

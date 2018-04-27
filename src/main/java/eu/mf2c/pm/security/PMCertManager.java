@@ -25,7 +25,7 @@ import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
  * Entry point to the application.  This application supports the Agent
  * registration process.
  * <p>
- * In IT&#45;1, it needs to be started with the following arguments&#58
+ * In IT&#45;1, it needs to be started with the following arguments&#58;
  * <ul>
  * <li>CauIP</li>
  * <li>LeaderCauIP</li>
@@ -45,11 +45,10 @@ import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
  * After which, it contacts the Categorisation block via ReST to initiate the agent 
  * categorisation process.
  * <p>
- * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
- *      UKRI Science and Technology Council
- * @Created 9 Apr 2018
+ * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
+ *     UKRI Science and Technology Council
+ * Date 9 Apr 2018
  */
 public class PMCertManager {
 	//
@@ -101,7 +100,7 @@ public class PMCertManager {
 	 * Usage: PMCertManager &#60;CauIP&#91;#58;port number&#93;&#62; &#60;LeaderCauIP&#91;#58;port number&#93;&#62;
 	 * <p>
 	 * @param args	Application arguments.
-	 * @throws Exception 
+	 * @throws Exception 	on error
 	 */
 	public static void main(String[] args) throws Exception {
 		if (args.length < 2) {

@@ -4,13 +4,16 @@
 .settings/
 
 log/
-#target/
+target/
 src/main/resources/cau.key.pem
 
 
 
 /bin/
-/Dockerfile
+
 /mF2C-cau-client.log
+
 /mF2Ccacert.jks
+
 /mF2Cjks.jks
+

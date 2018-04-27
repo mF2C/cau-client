@@ -26,12 +26,10 @@ import org.apache.log4j.Logger;
  * The Categorisation block is assumed to reside on the
  * localhost.
  * <p>
- * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
- *      UKRI Science and Technology Council
- * @Created 17 Apr 2018
- * <p>
+ * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
+ *     UKRI Science and Technology Council
+ * Date 17 Apr 2018
  */
 public class HttpURLClient extends Thread {
 	/** message logger attribute */

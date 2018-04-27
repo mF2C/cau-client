@@ -40,11 +40,10 @@ import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
  * certificate.
  * <p>
  * 
- * @author Shirley Crompton
- * @email shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group, UKRI Science and Technology Council
- * @Created 16 Apr 2018
- *          <p>
+ * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
+ *     UKRI Science and Technology Council
+ * Date 16 Apr 2018
  */
 public class LeadAgentCauClient extends Thread {
 	/** Message logger attribute */
@@ -172,11 +171,10 @@ public class LeadAgentCauClient extends Thread {
 	 * Listener to capture the server certificate and load this into the trust store
 	 * managed by the {@link StoreManagerSingleton <em>StoreManagerSingleton</em>}.
 	 * <p>
-	 * 
-	 * @author Shirley Crompton
-	 * @email shirley.crompton@stfc.ac.uk
-	 * @org Data Science and Technology Group, UKRI Science and Technology Council
-	 * @Created 13 Apr 2018
+	 * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
+	 * org Data Science and Technology Group,
+	 *     UKRI Science and Technology Council
+	 * Date 13 Apr 2018
 	 */
 	class SimpleHandShakeCompletedListener1 implements HandshakeCompletedListener {
 		// :TODO extract this out as an independent class in next iteration!!!!!
