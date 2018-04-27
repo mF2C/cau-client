@@ -55,6 +55,8 @@ public class BasicSocketServer {
     public BufferedReader inReader = null;
     /** Collection of input values from the Discovery block */
     private HashMap<String, String> cache = new HashMap<String,String>();
+    /** flag to control state of socket */
+    private boolean isRunning = true;
     
     /*
      * Construct an instance.
@@ -92,7 +94,7 @@ public class BasicSocketServer {
         //       
         LOGGER.info("Socket running on port : " + s.getLocalPort() + ", waiting for connection");
         try {
-        	while(true) { //infinite loop
+        	while(isRunning) { //infinite loop
 		        //get the connection socket
 		        conn = s.accept(); //connection blocks
 		        LOGGER.debug("Connection received from " + conn.getInetAddress().getHostName() + " : " + conn.getPort());
@@ -107,7 +109,7 @@ public class BasicSocketServer {
 		        CauClient client = new CauClient(this.cache); //may throw exceptions on instantiation
 		        client.start();
         	}
-        }finally {
+        }finally {        	
         	this.shutdown();
         }
     }
@@ -117,6 +119,7 @@ public class BasicSocketServer {
      * @throws IOException on error
      */
     public void shutdown() throws IOException {
+    	this.isRunning = false;
     	if(inReader != null) {
     		inReader.close();
     	}
