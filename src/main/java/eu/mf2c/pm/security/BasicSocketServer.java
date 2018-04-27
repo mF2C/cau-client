@@ -117,7 +117,9 @@ public class BasicSocketServer {
      * @throws IOException on error
      */
     public void shutdown() throws IOException {
-    	inReader.close();
+    	if(inReader != null) {
+    		inReader.close();
+    	}
         s.close();
     }
     /**
