@@ -138,6 +138,7 @@ public class LeadAgentCauClient extends Thread {
 			this.sslFactory = this.sslContext.getSocketFactory();
 			// we block for comm with cau, so no time out
 			this.socket = (SSLSocket) this.sslFactory.createSocket(this.leaderCauIP, this.leaderCauPort);			
+			LOGGER.debug("Created leader  client socket for Leader CAU(" + this.leaderCauIP + ":" + this.leaderCauPort + ")");
 			// add listener to capture server certificate
 			this.socket.addHandshakeCompletedListener(new SimpleHandShakeCompletedListener1("leaderCau"));
 			this.socket.startHandshake();

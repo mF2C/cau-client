@@ -17,13 +17,14 @@
 FROM openjdk:8-jdk-alpine
 #
 LABEL author="Shirley Crompton" \
-      organisation="UK RI STFC" \
-      application="mF2C CAU client" 
+      vendor="UK RI STFC" \
+      eu.mf2c-project.version="0.0.1-beta" \
+      eu.mf2c-project.version.is-production="false" 
 #
 # regional CAU ip and port
-ENV CAU_URL=127.0.0.1:46400
+ENV CAU_URL="127.0.0.1:46400"
 # leader CAU ip and port
-ENV LCAU_URL=127.0.0.1:46410
+ENV LCAU_URL="127.0.0.1:46410"
 RUN mkdir /var/app
 ADD cau-client.jar /var/app/cau-client.jar
 WORKDIR /var/app

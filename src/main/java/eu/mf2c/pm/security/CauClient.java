@@ -150,6 +150,7 @@ public class CauClient extends Thread {
 			this.sslFactory = this.sslContext.getSocketFactory();
 			//we block for comm with cau, so no time out
 			this.socket = (SSLSocket) this.sslFactory.createSocket(this.cauIP, this.cauPort);
+			LOGGER.debug("Created cau client socket for CAU(" + this.cauIP + ":" + this.cauPort + ")");
 			//for debugging, can be disabled
 			//this.logSocketInfo();
 			//add listener to capture server certificate
