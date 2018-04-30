@@ -68,7 +68,7 @@ public class StoreManagerSingleton {
 	/** An instance of the class */
 	private static StoreManagerSingleton instance = null;
 	/** A password String to protected the keystore */
-	private static final String STOREPASS = "stfc-mf2c-trust"+Instant.now().getNano();
+	private static final String STOREPASS = "stfc-mf2c-jkspass";
 	/** A password String to protected the truststore */
 	private static final String TRUSTPASS = "changeit";
 	/** A password String to protected the key entry */
@@ -319,7 +319,8 @@ public class StoreManagerSingleton {
 		try {
 			keyStore = KeyStore.getInstance("JKS");		
 		    if (file.exists()) {
-		        // if exists, load		        
+		        // if exists, load
+		    	LOGGER.debug("keystore exists: loading file from " + STORE_PATH);
 				keyStore.load(new FileInputStream(file), STOREPASS.toCharArray());
 		    } else {
 		        // if not exists, create it
@@ -394,7 +395,8 @@ public class StoreManagerSingleton {
 	 * @throws StoreManagerSingletonException if no such algorithm encountered.
 	 */
 	public void generateKeyPair() throws StoreManagerSingletonException {
-		
+		//you sign your CSR with the private key and once you get the certificate back from the CA
+		//your private key is stored together with the certificate as a keyEntry
 		KeyPairGenerator keyGen;
 		try {
 			keyGen = KeyPairGenerator.getInstance("RSA");

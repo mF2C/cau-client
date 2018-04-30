@@ -124,6 +124,7 @@ public class BasicSocketServer {
     		inReader.close();
     	}
         s.close();
+        LOGGER.debug("completed shutdown process....");
     }
     /**
      * Parse the incoming message String and get the attribute
