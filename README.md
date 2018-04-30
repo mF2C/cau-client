@@ -6,5 +6,5 @@ For the IT1 demo, the socket server runs on 127.0.0.1:46065.  Both the CAU and l
 
 Example usage:
 
-java -jar cau.client.jar 127.0.0.1:46400 127.0.0.1:46410 
+java -jar cau-client.jar 127.0.0.1:46400 127.0.0.1:46410 
 

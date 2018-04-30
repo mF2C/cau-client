@@ -212,7 +212,7 @@ public class StoreManagerSingleton {
 				file.createNewFile();
 			}
 			//file is appended to if exist
-		    keyStore.store(new FileOutputStream(file), KEYPASS.toCharArray());
+		    keyStore.store(new FileOutputStream(file), STOREPASS.toCharArray());
 		} catch (KeyStoreException| NoSuchAlgorithmException | CertificateException |IOException e ) {
 			LOGGER.error("Error writing store to file(" + file.getPath() + ": " + e.getMessage());
 			throw new StoreManagerSingletonException("Error writing store to file" + file.getPath() + ": " + e.getMessage());
@@ -321,6 +321,7 @@ public class StoreManagerSingleton {
 		    if (file.exists()) {
 		        // if exists, load
 		    	LOGGER.debug("keystore exists: loading file from " + STORE_PATH);
+		    	//LOGGER.debug("storepass: " + STOREPASS);
 				keyStore.load(new FileInputStream(file), STOREPASS.toCharArray());
 		    } else {
 		        // if not exists, create it

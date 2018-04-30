@@ -84,7 +84,7 @@ public class BasicSocketServer {
             try {
             	shutdown(); //JVM will always close socket and streams anyway
                 LOGGER.info("The basic socket server is shutting down!");
-                System.out.print("The basic socket server is shutting down.....");
+                //System.out.print("The basic socket server is shutting down.....");
                 StoreManagerSingleton.getInstance().persistKeyStores();
                 //
             } catch (IOException | StoreManagerSingletonException e) { /* failed */ 
@@ -109,6 +109,8 @@ public class BasicSocketServer {
 		        CauClient client = new CauClient(this.cache); //may throw exceptions on instantiation
 		        client.start();
         	}
+        }catch(Exception e){
+        	LOGGER.error("Error running basic socket server : " + (e.getMessage() == null ? " unknown error " : e.getMessage()));        	
         }finally {        	
         	this.shutdown();
         }
