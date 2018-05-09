@@ -31,11 +31,11 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.log4j.Logger;
 
-import eu.mf2c.pm.security.Exception.CauClientException;
+import eu.mf2c.pm.security.Exception.LeadAgentCauClientException;
 import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
 
 /**
- * A socket client to communicate with the Lead Agent CAU. In IT1 demo, we
+ * A socket client to communicate with the Lead Agent CAU. In IT&#45;1 demo, we
  * perform a SSL handshake with the component to verify the newly obtained agent
  * certificate.
  * <p>
@@ -45,9 +45,12 @@ import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
  *     UKRI Science and Technology Council
  * Date 16 Apr 2018
  */
-public class LeadAgentCauClient extends Thread {
+public class LeadAgentCauClient /*extends Thread*/ {
+	//9May2018 changed to a synchronous call in IT1
 	/** Message logger attribute */
-	protected Logger LOGGER = Logger.getLogger(LeadAgentCauClient.class);
+	protected Logger LOGGER = Logger.getLogger(LeadAgentCauClient.class);	 
+	/** StoreManagerSingle instance */
+	protected StoreManagerSingleton sms;
 	/** ssl context attribute */
 	private SSLContext sslContext = null;
 	/** ssl socket factory attribute */
@@ -64,8 +67,8 @@ public class LeadAgentCauClient extends Thread {
 	/** leader CAU port attribute */
 	private int leaderCauPort = 0;
 	/** the next four attributes are passed in by the discovery block */
-	/** lead agent ID attribute */
-	private String leaderID = null;
+	/** lead agent ID attribute 
+	private String leaderID = null;*/
 	/**
 	 * lead agent MAC address attribute private String leaderMacAddr = null;
 	 */
@@ -73,9 +76,6 @@ public class LeadAgentCauClient extends Thread {
 	private String idKey = null;
 	/** agent device ID */
 	private String deviceID = null;
-	 
-	/** StoreManagerSingle instance */
-	protected StoreManagerSingleton sms;
 
 	/**
 	 * Instantiate an instance.
@@ -126,10 +126,12 @@ public class LeadAgentCauClient extends Thread {
 		return sslContext;
 	}
 	/**
-	 * {@inheritDoc}
+	 * Perform a TLS handshake over TCP to verify the new
+	 * agent certificate
+	 * @throws LeadAgentCauClientException on error
 	 */
-	@Override
-	public void run() {
+	//@Override
+	public void run() throws LeadAgentCauClientException {
 		OutputStream out = null;
 		//
 		try {
@@ -148,13 +150,16 @@ public class LeadAgentCauClient extends Thread {
 			out.write("bye".getBytes());
 			this.socket.close();
 		} catch (Exception e) {
-			String msg = "Error running leadAgentCau socket client: " + e.getMessage();
-			LOGGER.error(msg);
-			Thread thread = Thread.currentThread();
-			thread.getUncaughtExceptionHandler().uncaughtException(thread, new CauClientException(msg)); //could have own exception class
+			String msg = "leadAgentCau socket client excepton: " + e.getMessage();
+			//LOGGER.error(msg);
+			throw new LeadAgentCauClientException(msg);
+			//Thread thread = Thread.currentThread();
+			//thread.getUncaughtExceptionHandler().uncaughtException(thread, new CauClientException(msg)); //could have own exception class
 		} finally {
 			try {
-				out.close();
+				if(out != null) {
+					out.close();					
+				}
 			} catch (IOException e) {
 				// Too bad
 				LOGGER.error("failed to release resources : " + e.getMessage());

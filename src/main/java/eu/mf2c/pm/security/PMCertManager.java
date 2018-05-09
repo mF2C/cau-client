@@ -121,7 +121,8 @@ public class PMCertManager {
 		//runs the server which is not threaded.  The control passes to the server.
 		bss.runSocket();		
 		//
-		System.exit(0);		
+		/*System.exit(0); //9May18 use flag to exit in the BasicSocketServer class and this method returns when 
+		bss.runSocket() returns*/
 	}
 
 }

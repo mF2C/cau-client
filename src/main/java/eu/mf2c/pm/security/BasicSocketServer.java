@@ -18,6 +18,7 @@ package eu.mf2c.pm.security;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -31,13 +32,12 @@ import eu.mf2c.pm.security.Exception.BasicSocketServerException;
 import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
 
 /**
- * A basic socket server to listening to incoming messages.
- * For IT1, we listen to the&#58;
- * <ul>
- * <li>Discovery block triggering the process flow to contact the CAU server to obtain an agent 
- * certificate.</li>
- * <li>Identity block sending device identity info</li>
- * </ul> * 
+ * A basic socket server to listen to incoming messages.
+ * For IT1, we listen to the the Policy block triggering the process 
+ * flow to contact the CAU server to obtain an agent 
+ * certificate.
+ * The trigger is handled synchronously and the server returns
+ * either an error message or an OK message.
  * <p>
  * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
  * org Data Science and Technology Group,
@@ -53,7 +53,9 @@ public class BasicSocketServer {
     public Socket conn = null;
     /** Buffered reader object for reading client input */
     public BufferedReader inReader = null;
-    /** Collection of input values from the Discovery block */
+    /** socket server output stream object */
+    OutputStream os = null;
+    /** Collection of input values from the Policy block */
     private HashMap<String, String> cache = new HashMap<String,String>();
     /** flag to control state of socket */
     private boolean isRunning = true;
@@ -79,7 +81,7 @@ public class BasicSocketServer {
     	//no thread here, as we only needs to listen to discovery block
         //s = new ServerSocket(0 , 2, InetAddress.getByName("127.0.0.1")); //auto port n#, max 2 connections, local host
     	s = new ServerSocket(46065 , 2, InetAddress.getByName("0.0.0.0")); //IT1 fixed port n#, max 2 connections, use ip 0 for container service 8/5/18
-        //add a shutdown hook for when user terminates JVM
+        /*add a shutdown hook for when user terminates JVM
         Runtime.getRuntime().addShutdownHook(new Thread(){public void run(){
             try {
             	shutdown(); //JVM will always close socket and streams anyway
@@ -87,30 +89,42 @@ public class BasicSocketServer {
                 //System.out.print("The basic socket server is shutting down.....");
                 StoreManagerSingleton.getInstance().persistKeyStores();
                 //
-            } catch (IOException | StoreManagerSingletonException e) { /* failed */ 
+            } catch (IOException | StoreManagerSingletonException e) { // failed 
             	LOGGER.error("Error shutting down socket: " + e.getMessage());
 			}
-        }});
+        }});*/
         //       
         LOGGER.info("Socket running on port : " + s.getLocalPort() + ", waiting for connection");
         try {
-        	while(isRunning) { //infinite loop
+        	while(isRunning) { 
 		        //get the connection socket
 		        conn = s.accept(); //connection blocks
+		        os = conn.getOutputStream();
 		        LOGGER.debug("Connection received from " + conn.getInetAddress().getHostName() + " : " + conn.getPort());
 		        //set up input read
 		        inReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		        //read in a Base64 encoded Json String
-		        String base64String = inReader.readLine();
-		        String message = new String(Base64.getDecoder().decode(base64String),StandardCharsets.UTF_8);
+		        String message = inReader.readLine(); //9May18 removed base64 encoding
+		        LOGGER.debug("Incoming message: " + message);
 		        //
 		        this.getValues(message);
 		        //now we got all the values, spawn a thread to do the CAU interaction
-		        CauClient client = new CauClient(this.cache); //may throw exceptions on instantiation
-		        client.start();
+		        CauClient client = new CauClient(this.cache); //may throw exceptions on instantiation		        
+		        //9May18 change to a method call		        
+		        //client.start();
+		        client.run();
+		        //if we get to here, the process ran OK otherwise we would be in the exception block
+		        os.write("OK".getBytes()); //send OK to policy block
+		        //add the shut down for IT1 until we know what's the lifecycle of the Agent
+		        this.isRunning = false;
+		        //end 9May18
         	}
         }catch(Exception e){
-        	LOGGER.error("Error running basic socket server : " + (e.getMessage() == null ? " unknown error " : e.getMessage()));        	
+        	this.isRunning = false;
+        	String errMsg = "ERROR:" + (e.getMessage() == null ? " unknown error " : e.getMessage());
+        	LOGGER.error(errMsg);
+        	if(os != null) {
+        		os.write(errMsg.getBytes());
+        	}
         }finally {        	
         	this.shutdown();
         }
@@ -120,26 +134,35 @@ public class BasicSocketServer {
      * <p> 
      * @throws IOException on error
      */
-    public void shutdown() throws IOException {
-    	this.isRunning = false;
+    public void shutdown() throws IOException {    	
     	if(inReader != null) {
     		inReader.close();
     	}
+    	if(os != null) {
+    		os.close();
+    	}
         s.close();
+        //9May2018 no longer running an infinite loop, moved this from the shutdown hook
+        try {
+			StoreManagerSingleton.getInstance().persistKeyStores();
+		} catch (StoreManagerSingletonException e) {
+			// just log the error
+			LOGGER.error("Error persisting keystores: " + e.getMessage());			
+		}
         LOGGER.debug("completed shutdown process....");
     }
     /**
      * Parse the incoming message String and get the attribute
      * values.  The message contains values which are represented 
-     * as key&#45;value pairs, with each pair separated by a &#39;,&#39; 
+     * as key&#45;value pairs, with each pair separated by a &#34;,&#34; 
      * <p>
      * @param message  incoming message
      * @throws BasicSocketServerException on errors
      */
     private void getValues(String message) throws BasicSocketServerException {
     	//tokenise message
-    	//E.g.: leaderID=ablcidek1234;leaderMacAddr=00-14-22-01-23-45;idKey=12345678-1234-5678-1234-567812345678;deviceId=00-14-22-01-23-45
-    	String[] msgList = message.split(";");
+    	//E.g.: "detectedLeaderID=56789,deviceID=123456789,IDkey=someIDKey,MACaddr=ab:cd:ef:01:23:45"
+    	String[] msgList = message.split(",");
     	for (String entry : msgList) {
     		  String[] keyValue = entry.split("=");
     		  this.cache.put(keyValue[0],keyValue[1]);
@@ -148,7 +171,4 @@ public class BasicSocketServer {
     		throw new BasicSocketServerException("Incorrect number of values received! Cannot continue.");
     	}
     }
-
-	
-
 }

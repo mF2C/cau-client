@@ -21,10 +21,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 
 import javax.net.ssl.HandshakeCompletedEvent;
@@ -43,11 +41,9 @@ import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
 import eu.mf2c.pm.security.util.Utils;
 
 /**
- * A client to communicate with the local CAU and obtain an agent certificate.
- * In IT&#45;1&#58; after obtaining the certificate from the cloud CA via the local CAU, 
+ * A socket client to communicate with the regional CAU and obtain an agent certificate.
+ * In IT&#45;1&#58; after obtaining the certificate from the fog CA via the regional CAU, 
  * it will perform a SSL handshake with the leader CAU to verify the certificate.
- * Then it calls the Categorisation block via REST to trigger the agent categorisation
- * process.
  * <p>
  * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
  * org Data Science and Technology Group,
@@ -55,7 +51,8 @@ import eu.mf2c.pm.security.util.Utils;
  * Date 5 Apr 2018
  *
  */
-public class CauClient extends Thread {
+public class CauClient/* extends Thread*/ {
+	//9May2019 changed to a synchronous call
 	
 	protected Logger LOGGER = Logger.getLogger(CauClient.class);
 	/** ssl context attribute */
@@ -129,18 +126,21 @@ public class CauClient extends Thread {
 		if(cache.get("leaderCauIP").contains(":")) {
 			this.leaderCauPort = Utils.getPortNum(cache.get("leaderCauIP"));
 		}
-		this.idKey = cache.get("idKey");
-		this.leaderMacAddr = cache.get("leaderMacAddr");
+		this.idKey = cache.get("IDkey");
+		this.leaderMacAddr = cache.get("MACaddr");
 		this.deviceID = cache.get("deviceID");
-		this.leaderID = cache.get("leaderID");
+		this.leaderID = cache.get("detectedLeaderID");
 		//this.createSSLContext();
 		
 	}
 	/**
-	 * {@inheritDoc}
+	 * Run the process to establish a secure TLS connection with the regional CAU.
+	 * Then send a request message for an agent certificate and trigger
+	 * an TLS handshake with the leader agent&#39;CAU.
+	 * @throws CauClientException on error
 	 */
-	@Override
-	public void run() {
+	//@Override
+	public void run() throws CauClientException {
 		OutputStream out = null;
 		BufferedInputStream in = null;
 		//
@@ -157,9 +157,8 @@ public class CauClient extends Thread {
 			this.socket.addHandshakeCompletedListener(new SimpleHandShakeCompletedListener("cau"));
 			this.socket.startHandshake(); 
 			//should be OK to message now
-			String csrString = null; 
-			csrString = sms.createCSRString(); //CN = idKey
-			//CSR=,leaderID=;leaderMacAddr=;idKey=;deviceId=
+			String csrString = sms.createCSRString(); //CN = idKey
+			//csr=csrContentAsString,IDkey=someIDKey,MACaddr=ab:cd:ef:01:23:45,detectedLeaderID=56789,deviceID=123456789
 			byte[] msgBytes = getMsgBytes(csrString);
 			out = this.socket.getOutputStream();
 			//
@@ -179,37 +178,40 @@ public class CauClient extends Thread {
 			/********************
 			 
 			  :TODO Not sure if CAU is going to return a certificate chain or just the signed certificate
+			  9May2018 assumes just the signed certificate
 			
 			*********************/
-			//needs to base64 decode
-			String certStr = new String(Base64.getDecoder().decode(baos.toByteArray()), StandardCharsets.UTF_8);
-			//generate the certificate with the UTF8 String
-			X509Certificate agentCert = sms.generateCertFromBytes(certStr.getBytes());
+			//String certStr = new String(Base64.getDecoder().decode(baos.toByteArray()), StandardCharsets.UTF_8);
+			//9May18 removed base64 encoding
+			X509Certificate agentCert = sms.generateCertFromBytes(baos.toByteArray());
 			//validate certificate, just a simple check for the moment
 			LOGGER.info("agent certificate dn: " + agentCert.getSubjectX500Principal().getName());
 			//store to keystore
 			sms.storeKeyEntry(this.idKey, this.leaderID, agentCert);//using leaderId as the fogId for IT1 demo
 			//now verify certificate with leader agent's cau (basically an TLS handshake)
 			LeadAgentCauClient leaderClient = new LeadAgentCauClient(sms, this.idKey, this.leaderCauIP, this.leaderCauPort, this.deviceID); //may throw exceptions on instantiation
-		    leaderClient.start();
-			//control passes over the the leader client, it will trigger the categorisation if the handshake with
-		    //the leader CAU is OK
-			
+			//9May2018 changed from a thread to a synchronous method call
+		    //leaderClient.start();
+			leaderClient.run();
 		} catch (Exception e) {
-			 String msg = "Error running cau socket client: " + e.getMessage();
-			 LOGGER.error(msg);
-			 Thread thread = Thread.currentThread();
-             thread.getUncaughtExceptionHandler().uncaughtException(thread, new CauClientException(msg));
+			 String msg = "cau socket client exception: " + e.getMessage();
+			 //LOGGER.error(msg);
+			 throw new CauClientException(msg);
+			 //Thread thread = Thread.currentThread();
+             //thread.getUncaughtExceptionHandler().uncaughtException(thread, new CauClientException(msg));
 		} finally{
 			try {
-				in.close();
-				out.close();
-				
+				if(in != null) {
+					in.close();					
+				}
+				if(out != null) {
+					out.close();
+				}
 			} catch (IOException e) {
 				// Too bad
 				LOGGER.error("failed to release resources : " + e.getMessage());
 			}
-		}		
+		}
 	} 
 		
 		
@@ -217,19 +219,22 @@ public class CauClient extends Thread {
 		
 	
 	/**
-	 * Create the request message for the local CAU
+	 * Create the request message 
 	 * <p>
 	 * @param csrString		A {@link java.lang.String <em>String</em>} representation of the CSR.
 	 * @return	A byte array representation of the message.
 	 */
 	private byte[] getMsgBytes(String csrString) {
+		//csr=csrContentAsString,IDkey=someIDKey,MACaddr=ab:cd:ef:01:23:45,detectedLeaderID=56789,deviceID=123456789
 		//
-		String l_deviceId = "deviceId=" + this.deviceID;
-		String l_leaderId = "leaderId=" + this.leaderID;
-		String l_leaderMacAddr = "leaderMacAddr=" + this.leaderMacAddr;
-		String l_idKey = "idKey=" + this.idKey;
+		String l_deviceId = "deviceID=" + this.deviceID;
+		String l_leaderId = "detectedLeaderID=" + this.leaderID;
+		String l_leaderMacAddr = "MACaddr=" + this.leaderMacAddr;
+		String l_idKey = "IDkey=" + this.idKey;
 		//
-		return Base64.getEncoder().encode(("csr=" + csrString + ";" + l_leaderId + ";" + l_leaderMacAddr + ";" + l_idKey + ";" + l_deviceId).getBytes());		
+		//9May2018 removed base64 encoding
+		//return Base64.getEncoder().encode(("csr=" + csrString + "," + l_leaderId + "," + l_leaderMacAddr + "," + l_idKey + "," + l_deviceId).getBytes());		
+		return ("csr=" + csrString + "," + l_leaderId + "," + l_leaderMacAddr + "," + l_idKey + "," + l_deviceId).getBytes();
 	}
 	/**
 	 * Print properties of the client socket for debug purposes.
