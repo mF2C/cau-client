@@ -166,6 +166,7 @@ public class BasicSocketServer {
     	for (String entry : msgList) {
     		  String[] keyValue = entry.split("=");
     		  this.cache.put(keyValue[0],keyValue[1]);
+    		  LOGGER.debug("cached " + keyValue[0] + ": " + keyValue[1]);
     	}
     	if(cache.size() != 6) {//2 ip addresses + 4 here
     		throw new BasicSocketServerException("Incorrect number of values received! Cannot continue.");

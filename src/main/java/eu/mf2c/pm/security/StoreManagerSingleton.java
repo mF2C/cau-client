@@ -297,9 +297,9 @@ public class StoreManagerSingleton {
 		        trustStore.load(null, TRUSTPASS.toCharArray()); //initialise
 		        trustStore.store(new FileOutputStream(file), TRUSTPASS.toCharArray());
 		    }
-		    //9May18 updated to use the new CA cert
+		    //9May18 updated to use the new CA cert 14May loaded untrust and fog ca public keys
 		    storeCertificate("fog-sub",generateCertfromPEM(this.getClass().getResourceAsStream("/ca_fog.pem")));
-		    storeCertificate("00root",generateCertfromPEM(this.getClass().getResourceAsStream("/ca_root.pem")));
+		    storeCertificate("ut-sub",generateCertfromPEM(this.getClass().getResourceAsStream("/ca_untrust.pem")));
 		    //storeCertificate("fog-sub",generateCertfromPEM(this.getClass().getResourceAsStream("/fog-sub.pem")));
 		    //storeCertificate("01subca",generateCertfromPEM(this.getClass().getResourceAsStream("/01subca.pem")));
 		    //storeCertificate("00root",generateCertfromPEM(this.getClass().getResourceAsStream("/00root.pem")));
