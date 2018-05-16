@@ -52,7 +52,7 @@ import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
  */
 public class PMCertManager {
 	//
-	protected Logger LOGGER = Logger.getLogger(PMCertManager.class);	
+	protected static Logger LOGGER = Logger.getLogger(PMCertManager.class);	
 	
 	/**
 	 * Retrieve the required Cau IP address.
@@ -114,6 +114,7 @@ public class PMCertManager {
 		HashMap<String, String> addressesHM = new HashMap<String, String>();
 		addressesHM.put("cauIP", args[0]);
 		addressesHM.put("leaderCauIP", args[1]);
+		LOGGER.debug("Incoming arguments: " + addressesHM.toString());
 		//bootstrap the storeManager now
 		pmCM.setupStoreManager();
 		//start the server to listen to discovery. 

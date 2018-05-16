@@ -131,6 +131,9 @@ public class CauClient/* extends Thread*/ {
 		this.deviceID = cache.get("deviceID");
 		this.leaderID = cache.get("detectedLeaderID");
 		//this.createSSLContext();
+		LOGGER.debug("Got IDkey: " + this.idKey + ", leaderMacAddr: " + this.leaderMacAddr 
+				+ ", deviceID: " + this.deviceID + ", leaderID: " + this.leaderID + ", leaderCAU: " 
+				+ this.leaderCauIP.toString() + ":" + this.leaderCauPort);
 		
 	}
 	/**
@@ -157,7 +160,7 @@ public class CauClient/* extends Thread*/ {
 			this.socket.addHandshakeCompletedListener(new SimpleHandShakeCompletedListener("cau"));
 			this.socket.startHandshake(); 
 			//should be OK to message now
-			String csrString = sms.createCSRString(); //CN = idKey
+			String csrString = sms.createCSRString(this.idKey); //CN = idKey
 			//csr=csrContentAsString,IDkey=someIDKey,MACaddr=ab:cd:ef:01:23:45,detectedLeaderID=56789,deviceID=123456789
 			byte[] msgBytes = getMsgBytes(csrString);
 			out = this.socket.getOutputStream();
@@ -176,10 +179,7 @@ public class CauClient/* extends Thread*/ {
 			this.socket.close();
 			
 			/********************
-			 
-			  :TODO Not sure if CAU is going to return a certificate chain or just the signed certificate
-			  9May2018 assumes just the signed certificate
-			
+			 Finally found out on 14May18 that the CA returns just a signed cert			
 			*********************/
 			//String certStr = new String(Base64.getDecoder().decode(baos.toByteArray()), StandardCharsets.UTF_8);
 			//9May18 removed base64 encoding
@@ -188,6 +188,7 @@ public class CauClient/* extends Thread*/ {
 			LOGGER.info("agent certificate dn: " + agentCert.getSubjectX500Principal().getName());
 			//store to keystore
 			sms.storeKeyEntry(this.idKey, this.leaderID, agentCert);//using leaderId as the fogId for IT1 demo
+			LOGGER.debug("About call the leader cau....");
 			//now verify certificate with leader agent's cau (basically an TLS handshake)
 			LeadAgentCauClient leaderClient = new LeadAgentCauClient(sms, this.idKey, this.leaderCauIP, this.leaderCauPort, this.deviceID); //may throw exceptions on instantiation
 			//9May2018 changed from a thread to a synchronous method call
