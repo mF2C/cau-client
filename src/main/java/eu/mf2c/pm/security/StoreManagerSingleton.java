@@ -69,8 +69,8 @@ public class StoreManagerSingleton {
 	private static final String STOREPASS = "stfc-mf2c-jkspass";
 	/** A password String to protected the truststore */
 	private static final String TRUSTPASS = "changeit";
-	/** A password String to protected the key entry */
-	private static final String KEYPASS = "stfc-mf2c-key"; //appended with the fog-id
+	/** A password String to protected the key entry 
+	private static final String KEYPASS = "stfc-mf2c-key"; //appended with the fog-id (18May18 apparently must be same as the keystore password!!!*/
 	/** A JKS keystore for private credentials */
 	private static KeyStore keyStore;
 	/** A JKS keystore for cacerts */
@@ -256,7 +256,7 @@ public class StoreManagerSingleton {
 		X509Certificate[] chain = (X509Certificate[]) mylist.toArray(new X509Certificate[mylist.size()]);
 		LOGGER.debug("About to store the end-entity cert with the fog ca cert as chain....");
 		//keypass is the passphrase to the cert
-		keyStore.setKeyEntry(alias, this.keypair.getPrivate(), (KEYPASS+fogID).toCharArray(), chain);
+		keyStore.setKeyEntry(alias, this.keypair.getPrivate(), (STOREPASS).toCharArray(), chain);
 		
 	}
 	/**
@@ -270,7 +270,7 @@ public class StoreManagerSingleton {
 	public PrivateKeyEntry getKeyEntry(String alias, String fogID) throws Exception{
 		if(keyStore.entryInstanceOf(alias,KeyStore.PrivateKeyEntry.class)){
 			LOGGER.debug("About to retrieve the keystore entry with alias = " + alias);
-			ProtectionParameter protParam = new KeyStore.PasswordProtection((KEYPASS+fogID).toCharArray());
+			ProtectionParameter protParam = new KeyStore.PasswordProtection((STOREPASS).toCharArray());
 			return (PrivateKeyEntry) keyStore.getEntry(alias, protParam);
 			
 		}else {

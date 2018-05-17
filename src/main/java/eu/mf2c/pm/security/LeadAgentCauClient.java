@@ -94,7 +94,7 @@ public class LeadAgentCauClient /*extends Thread*/ {
 	 */
 	public LeadAgentCauClient(StoreManagerSingleton storeManager, String alias, InetAddress ip, int port, String deviceID) {
 		this.sms = storeManager;
-		this.idKey = alias;
+		this.idKey = alias;//this is the key entry alias
 		this.leaderCauIP = ip;
 		this.leaderCauPort = port;
 		this.deviceID = deviceID;
@@ -111,17 +111,19 @@ public class LeadAgentCauClient /*extends Thread*/ {
 	 *             on error
 	 */
 	private SSLContext createSSLContext() throws Exception {
+		LOGGER.debug("About to create an SSL context for the leaderCauClient....");
 		// Security.addProvider(new BouncyCastleProvider());
 		// set up a key manager for our local credentials
 		TrustManagerFactory trustManagerFactory = TrustManagerFactory
 				.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		trustManagerFactory.init(sms.getTrustStore());
 		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		LOGGER.debug("About to set up sslcontext keystore for the leaderCauClient....");
 		keyManagerFactory.init(sms.getKeyStore(), sms.getStorePass().toCharArray());
 		// create a context and set up a socket factory
 		SSLContext sslContext = SSLContext.getInstance("TLS"); // 1.2 default
 		sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null); // 2 ways
-																											// authentication
+		LOGGER.debug("Finished createing an SSL context for the leaderCauClient....");																									// authentication
 
 		return sslContext;
 	}
