@@ -137,6 +137,7 @@ public class StoreManagerSingleton {
 	public String getStorePass() {
 		return STOREPASS;
 	}
+	
 	/**
 	 * Load a X.509 certificate from the provided input stream
 	 * <p>
@@ -245,6 +246,7 @@ public class StoreManagerSingleton {
 	 * @throws KeyStoreException	On error storing the key entry.
 	 */
 	public void storeKeyEntry(String alias, String fogID, X509Certificate cert) throws KeyStoreException {
+		LOGGER.debug("about to store key entry with alias: " + alias + ", fogID: " + fogID );		
 		//hard coding the certificate chain for IT1 demo
 		List<X509Certificate> mylist = new ArrayList<X509Certificate>();
 		mylist.add(cert); //the certificate associated with the private key last (entity cert)

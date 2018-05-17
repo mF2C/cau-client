@@ -165,6 +165,7 @@ public class CauClient/* extends Thread*/ {
 			byte[] msgBytes = getMsgBytes(csrString);
 			out = this.socket.getOutputStream();
 			//
+			LOGGER.debug("about to stream CSR to CAU....");
 			out.write(msgBytes);			
 			//wait for response, should be the signed certificate object
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -172,35 +173,35 @@ public class CauClient/* extends Thread*/ {
 			// Create buffer: typical cert is about 2KB, not sure about underlying capability, use a small buffer
 			byte[] buffer = new byte[1024]; //
 			int bytesRead = 0;
+			LOGGER.debug("waiting for CAU response....");
 			while ((bytesRead = in.read(buffer, 0, 1024)) != -1) {
+				//
 				baos.write(buffer, 0, bytesRead); //keep adding to the buffer
+				LOGGER.debug("written " + bytesRead + " bytes");
 			}
 			baos.flush();
-			this.socket.close();
-			
 			/********************
 			 Finally found out on 14May18 that the CA returns just a signed cert			
 			*********************/
+			LOGGER.debug("about to generate certificate from CAU response....");
 			//String certStr = new String(Base64.getDecoder().decode(baos.toByteArray()), StandardCharsets.UTF_8);
 			//9May18 removed base64 encoding
 			X509Certificate agentCert = sms.generateCertFromBytes(baos.toByteArray());
 			//validate certificate, just a simple check for the moment
 			LOGGER.info("agent certificate dn: " + agentCert.getSubjectX500Principal().getName());
+			LOGGER.info("agent cert issuer dn: " + agentCert.getIssuerDN().getName());	
 			//store to keystore
 			sms.storeKeyEntry(this.idKey, this.leaderID, agentCert);//using leaderId as the fogId for IT1 demo
-			LOGGER.debug("About call the leader cau....");
-			//now verify certificate with leader agent's cau (basically an TLS handshake)
-			LeadAgentCauClient leaderClient = new LeadAgentCauClient(sms, this.idKey, this.leaderCauIP, this.leaderCauPort, this.deviceID); //may throw exceptions on instantiation
-			//9May2018 changed from a thread to a synchronous method call
-		    //leaderClient.start();
-			leaderClient.run();
+			//
+			this.socket.close();
+			//		
 		} catch (Exception e) {
 			 String msg = "cau socket client exception: " + e.getMessage();
 			 //LOGGER.error(msg);
 			 throw new CauClientException(msg);
 			 //Thread thread = Thread.currentThread();
              //thread.getUncaughtExceptionHandler().uncaughtException(thread, new CauClientException(msg));
-		} finally{
+		} finally{	
 			try {
 				if(in != null) {
 					in.close();					
@@ -213,12 +214,20 @@ public class CauClient/* extends Thread*/ {
 				LOGGER.error("failed to release resources : " + e.getMessage());
 			}
 		}
-	} 
-		
-		
-		
-		
-	
+		//		
+		LOGGER.debug("Completed interaction with CAU.  About to call the leader cau....");
+		try {
+			//now verify certificate with leader agent's cau (basically an TLS handshake)
+			LeadAgentCauClient leaderClient = new LeadAgentCauClient(sms, this.idKey, this.leaderCauIP, this.leaderCauPort, this.deviceID); //may throw exceptions on instantiation
+			//9May2018 changed from a thread to a synchronous method call
+		    //leaderClient.start();
+			leaderClient.run();
+		}catch(Exception e) {
+			String msg = "cau leader client exception " + e.getMessage();
+			 //LOGGER.error(msg);
+			 throw new CauClientException(msg);
+		}
+	} 	
 	/**
 	 * Create the request message 
 	 * <p>
