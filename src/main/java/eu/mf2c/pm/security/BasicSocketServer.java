@@ -112,6 +112,7 @@ public class BasicSocketServer {
 		        //9May18 change to a method call		        
 		        //client.start();
 		        client.run();
+		        LOGGER.debug("CauClient returned, about to write OK to policy block ....");		        
 		        //if we get to here, the process ran OK otherwise we would be in the exception block
 		        os.write("OK".getBytes()); //send OK to policy block
 		        //add the shut down for IT1 until we know what's the lifecycle of the Agent

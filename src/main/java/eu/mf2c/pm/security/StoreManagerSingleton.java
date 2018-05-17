@@ -191,6 +191,7 @@ public class StoreManagerSingleton {
 	 */
 	public void persistKeyStores() throws StoreManagerSingletonException {
 		File file = null;
+	    LOGGER.debug("About to persist key and truststores....");
 		try {
 			//trustStore
 			if(trustStore.size() < 1) {
@@ -212,6 +213,7 @@ public class StoreManagerSingleton {
 			}
 			//file is appended to if exist
 		    keyStore.store(new FileOutputStream(file), STOREPASS.toCharArray());
+		    LOGGER.debug("Completed persisting key and truststores....");
 		} catch (KeyStoreException| NoSuchAlgorithmException | CertificateException |IOException e ) {
 			LOGGER.error("Error writing store to file(" + file.getPath() + ": " + e.getMessage());
 			throw new StoreManagerSingletonException("Error writing store to file" + file.getPath() + ": " + e.getMessage());
