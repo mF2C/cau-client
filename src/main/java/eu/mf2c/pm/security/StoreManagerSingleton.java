@@ -252,7 +252,7 @@ public class StoreManagerSingleton {
 		//hard coding the certificate chain for IT1 demo
 		List<X509Certificate> mylist = new ArrayList<X509Certificate>();
 		mylist.add(cert); //the certificate associated with the private key last (entity cert)
-		mylist.add((X509Certificate) trustStore.getCertificate("fog-sub"));
+		mylist.add((X509Certificate) trustStore.getCertificate("ut-sub")); //5July18 - new agent certs issued by untrust
 		//mylist.add((X509Certificate) trustStore.getCertificate("fog-sub"));
 		//mylist.add((X509Certificate) trustStore.getCertificate("00root"));
 		X509Certificate[] chain = (X509Certificate[]) mylist.toArray(new X509Certificate[mylist.size()]);

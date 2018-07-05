@@ -8,5 +8,5 @@ Example usage:
 
 java -jar cau-client.jar 127.0.0.1:46400 127.0.0.1:46410 
 
-The CAU client is bundled with the Fog CA public key which is used in the certificate path for the newly signed certificate.
+The CAU client is bundled with the Fog and Untrust CA certificates which are used as appropriate in the certificate path for the newly signed certificates.  For IT1, the Untrust CA is used to issue new agent certificates.
 
