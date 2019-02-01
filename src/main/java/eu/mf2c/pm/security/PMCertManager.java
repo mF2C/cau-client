@@ -96,7 +96,7 @@ public class PMCertManager {
 	}
 	
 	/**
-	 * Entry point to the applcation.  
+	 * Entry point to the application.  
 	 * Usage: PMCertManager &#60;CauIP&#91;#58;port number&#93;&#62; &#60;LeaderCauIP&#91;#58;port number&#93;&#62;
 	 * <p>
 	 * @param args	Application arguments.
