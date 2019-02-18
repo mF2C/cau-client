@@ -1,0 +1,1 @@
+The ca_fog.pem and ca_untrust.pem files are it2 version (18/2/2019)

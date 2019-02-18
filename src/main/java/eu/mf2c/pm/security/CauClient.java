@@ -192,6 +192,8 @@ public class CauClient/* extends Thread*/ {
 			LOGGER.info("agent cert issuer dn: " + agentCert.getIssuerDN().getName());	
 			//store to keystore
 			sms.storeKeyEntry(this.idKey, this.leaderID, agentCert);//using leaderId as the fogId for IT1 demo
+			//28Feb2019 store certificate to /pkiData/server.crt
+			sms.writeCertFile(agentCert);			
 			//
 			this.socket.close();
 			//		

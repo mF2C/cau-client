@@ -6,6 +6,8 @@ The CAU client is an internal block of an Agent and is deployed as part of the A
 
 For the IT1 demo, the socket server runs on 0.0.0.0:46065.  Both the CAU and leader CAU ip:port are expected to be passed in as application arguments on launching the application.
 
+For the IT2 demo, the agent's private key and X509 certificate are written to the shared file volume pkidata.  Traefik will pick up the credentials and use the certificate as its server credential.
+
 Example usage:
 
 java -jar cau-client.jar 127.0.0.1:46400 127.0.0.1:46410 

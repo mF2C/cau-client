@@ -26,6 +26,10 @@ ENV CAU_URL="127.0.0.1:46400"
 # leader CAU ip and port
 ENV LCAU_URL="127.0.0.1:46410"
 RUN mkdir /var/app
+#for sharing certificate and key with traefik
+RUN mkdir /pkidata
+VOLUME /pkidata
+#
 ADD cau-client.jar /var/app/cau-client.jar
 WORKDIR /var/app
 # 
