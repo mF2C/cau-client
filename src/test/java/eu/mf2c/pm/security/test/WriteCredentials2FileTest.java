@@ -48,6 +48,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
+
 import static org.junit.Assert.*;
 
 /**
@@ -69,6 +71,8 @@ public class WriteCredentials2FileTest {
 	private static SecureRandom random;
 	/** RSA keypair */
 	private static KeyPair keypair;
+	/** Location of credential folder 
+	private static String dataPath = File.separator + "pkidata" + File.separator;*/
 	
 	/**
 	 * @throws java.lang.Exception on errors
@@ -131,7 +135,7 @@ public class WriteCredentials2FileTest {
 	/**
 	 * Write the agent&#39;private key to file.
 	 */
-	private void writeKeyFile() {
+	private void writeKeyFile() {		
 		//18Feb2019 write the private key as pem to /pkidata/server.key
 		String absPath = File.separator + "pkidata" + File.separator + "server.key";
 		System.out.println("the private key file target : " + absPath);

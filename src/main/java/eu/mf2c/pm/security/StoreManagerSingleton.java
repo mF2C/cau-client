@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -31,12 +33,10 @@ import java.security.KeyStore.ProtectionParameter;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
@@ -92,7 +92,8 @@ public class StoreManagerSingleton {
 	private KeyPair keypair = null;
 	/** Secure random number generator attribute */
 	private static SecureRandom random = new SecureRandom();
-	
+	/** Location of mapped file volume */
+	private static String dataPath = File.separator + "pkidata" + File.separator;
 	
 	
 	/** 
@@ -424,15 +425,19 @@ public class StoreManagerSingleton {
 	}
 	
 	/**
-	 * Write the agent&#39;private key to file.
+	 * Write the agent&#39;private key to file if it does not exist.
 	 * <p>
 	 * @throws StoreManagerSingletonException	on errors
 	 */
 	public void writeKeyFile() throws StoreManagerSingletonException {
 		//18Feb2019 write the private key as pem to /pkidata/server.key
-		String absPath = File.separator + "pkidata" + File.separator + "server.key";
+		String absPath = dataPath + "server.key";
 		System.out.println("the private key file target : " + absPath);
 		LOGGER.debug("the private key file target : " + absPath);
+		if(new File(absPath).exists()) { //added 30 April 2019
+			LOGGER.info("key file exists already, not over-writing it.....");
+			return;
+		}
 		try (PemWriter pw = new PemWriter(new OutputStreamWriter(new FileOutputStream(absPath)))) {
 			// the description is used : BEGIN <description> in the PEM file
 			pw.writeObject(new PemObject("RSA PRIVATE KEY", this.keypair.getPrivate().getEncoded()));
@@ -443,15 +448,19 @@ public class StoreManagerSingleton {
 		}
 	}
 	/**
-	 * Write the agent&#39;certificate to file.
+	 * Write the agent&#39;certificate to file if it does not exist.
 	 * <p>
 	 * @param agentCert&#39;certificate 
 	 * @throws StoreManagerSingletonException	on errors
 	 */
 	public void writeCertFile(X509Certificate agentCert) throws StoreManagerSingletonException {
 		//18Feb2019 write the agent's X509 certiciate as pem to /pkidata/server.crt
-		String fileName = File.separator + "pkidata" + File.separator + "server.crt";
+		String fileName = dataPath + "server.crt";
 		LOGGER.debug("the X509 file target : " + fileName);
+		if(new File(fileName).exists()) { //added 30 April 2019
+			LOGGER.info("certificate file exists already, not over-writing it.....");
+			return;
+		}
 		if (agentCert != null) {
 			//PemWriter pw = new PemWriter(new OutputStreamWriter(new FileOutputStream(fileName)));
 			try (PemWriter pw = new PemWriter(new OutputStreamWriter(new FileOutputStream(fileName)))) {
@@ -465,6 +474,27 @@ public class StoreManagerSingleton {
 		} else {
 			System.out.println("Cannot write X.509 cert to " + fileName);
 			LOGGER.error("Cannot write X.509 cert to " + fileName);
+		}
+	}
+	/** 
+	 * Write the Agent&#39;s deviceID to the shared data volume 
+	 * <p>
+	 * @param did	a {@link java.lang.String <em>String</em>} representation of the Agent&#39;s device id.
+	 * @throws StoreManagerSingletonException	on IO errors
+	 */
+	public void writeDeviceID(String did) throws StoreManagerSingletonException {
+		//added 30 April 2019
+		String didFile = dataPath + "deviceid.txt";
+		LOGGER.debug("the deviceID file target : " + didFile);
+		try {
+			if(new File(didFile).exists()) { //added 30 April 2019
+				LOGGER.info("device id file exists already, not over-writing it.....");
+				return;
+			}		
+			Files.write(Paths.get("c:/output.txt"), did.getBytes());
+		} catch (IOException e) {
+			// 
+			throw new StoreManagerSingletonException(e);
 		}
 	}
 	

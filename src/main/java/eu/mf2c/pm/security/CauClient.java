@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -87,7 +88,7 @@ public class CauClient/* extends Thread*/ {
 	
 	/**
 	 * Create an SSLContext object with a truststore.
-	 * The regional CAU should not require client authentifcation.
+	 * The regional CAU should not require client authentication.
 	 * <p>
 	 * @return	the created SSLContext object
 	 * @throws Exception	on error
@@ -185,8 +186,12 @@ public class CauClient/* extends Thread*/ {
 			*********************/
 			LOGGER.debug("about to generate certificate from CAU response....");
 			//String certStr = new String(Base64.getDecoder().decode(baos.toByteArray()), StandardCharsets.UTF_8);
-			//9May18 removed base64 encoding
-			X509Certificate agentCert = sms.generateCertFromBytes(baos.toByteArray());
+			//9May18 removed base64 encoding, 27/2/2019 need to UTF-8 decode cloud CAU encodes stream to utf-8
+			//X509Certificate agentCert = sms.generateCertFromBytes(baos.toByteArray());
+			String certStr = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+			//generate the certificate
+			X509Certificate agentCert = sms.generateCertFromBytes(certStr.getBytes());
+			//end 27/2/2019
 			//validate certificate, just a simple check for the moment
 			LOGGER.info("agent certificate dn: " + agentCert.getSubjectX500Principal().getName());
 			LOGGER.info("agent cert issuer dn: " + agentCert.getIssuerDN().getName());	
@@ -195,6 +200,7 @@ public class CauClient/* extends Thread*/ {
 			//28Feb2019 store certificate to /pkiData/server.crt
 			sms.writeCertFile(agentCert);			
 			//
+			sms.writeDeviceID(this.deviceID); //added 30 April 2019
 			this.socket.close();
 			//		
 		} catch (Exception e) {

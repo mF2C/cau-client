@@ -86,7 +86,7 @@ public class PMCertManager {
 	public void setupStoreManager() throws StoreManagerSingletonException {
 		//this creates the keystore, and loads the fog-sub, 01subca and 00root certificate PEMs.
 		StoreManagerSingleton sms = StoreManagerSingleton.getInstance(); 
-		//
+		//	
 		sms.generateKeyPair();	
 		//	18Feb19 save private key as /pki-data/server.key
 		sms.writeKeyFile();
