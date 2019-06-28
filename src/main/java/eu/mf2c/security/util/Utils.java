@@ -13,11 +13,17 @@
    See the License for the specific language governing permissions and
    limitations under the License 
  */
-package eu.mf2c.pm.security.util;
+package eu.mf2c.security.util;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
+import eu.mf2c.security.Exception.CauClientServerException;
+import eu.mf2c.security.cc.CCRequestHandler;
 
 /**
  * Miscellaneous utility functions.
@@ -30,6 +36,9 @@ import java.util.HashMap;
  *
  */
 public class Utils {	
+	
+	/** Message logger attribute */
+	protected static Logger LOGGER = Logger.getLogger(Utils.class);
 	
 	/** Default String value */
 	private static String	digits = "0123456789abcdef";
@@ -124,6 +133,31 @@ public class Utils {
         return toHex(data, data.length);
     }
 	
+    /**
+     * Tokenise a comma&#45;separated {@link java.lang.String <em>String</em>} for
+     * the individual parameters. The tokens are key&#45;value pairs, with each 
+     * key&#45;value separated by a &#58; 
+     * <p>
+     * @param message  incoming message {@link java.lang.String <em>String</em>}
+     * @return	a {@link java.util.Map <em>Map</em>} of the extracted request parameters	
+     */
+    public static Map<String, String> getValues(String message) {
+    	//tokenise message, for legacy reason, the getCSR request is different from those for registerUser and getPK requests
+    	//E.g.: "detectedLeaderID=56789,deviceID=123456789,IDkey=someIDKey,leaderIP=IPString"
+    	
+    	//register user :  adduser=agentdeviceid
+    	//get public key : getpubkey=agentdeviceid
+    	
+    	Map<String, String> map = new HashMap<String, String>();
+    	String[] msgList = message.split(",");
+    	for (String entry : msgList) {
+    		  String[] keyValue = entry.split("=");
+    		  map.put(keyValue[0],keyValue[1]);    		  
+    	}
+    	map.forEach((k,v)->LOGGER.debug(k + " : " + v));
+    	return map;
+    }
+    
 	/**
      * Return a string of length len made up of blanks.
      * 

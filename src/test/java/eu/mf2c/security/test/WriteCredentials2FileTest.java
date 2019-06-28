@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License 
  */
-package eu.mf2c.pm.security.test;
+package eu.mf2c.security.test;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,8 +29,7 @@ import java.time.Period;
 import java.time.ZoneOffset;
 import java.util.Date;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -47,9 +46,6 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
-import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
-
 import static org.junit.Assert.*;
 
 /**
@@ -66,7 +62,7 @@ import static org.junit.Assert.*;
 public class WriteCredentials2FileTest {
 
 	/** Message Logger */
-	protected static Logger LOGGER = LogManager.getLogger(WriteCredentials2FileTest.class);
+	protected static Logger LOGGER = org.apache.log4j.Logger.getLogger(WriteCredentials2FileTest.class);
 	/** Secure random number generator attribute */
 	private static SecureRandom random;
 	/** RSA keypair */

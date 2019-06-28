@@ -13,17 +13,17 @@
    See the License for the specific language governing permissions and
    limitations under the License 
  */
-package eu.mf2c.pm.security.Exception;
+package eu.mf2c.security.Exception;
 /**
- * Errors associated with the {@link eu.mf2c.pm.security.LeadAgentCauClient <em>LeadAgentCauClient</em>} object.
+ * Errors associated with the {@link eu.mf2c.security.cc.IdManager <em>PMCertManager</em>} object.
  * <p>
  * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
  * org Data Science and Technology Group,
  *     UKRI Science and Technology Council
- * Date 9 April 2018
+ * Date 6 April 2018
  *
  */
-public class LeadAgentCauClientException extends Exception {
+public class PMCertManagerException extends Exception {
 	/**
 	 * unique identifier of this error
 	 */
@@ -34,7 +34,7 @@ public class LeadAgentCauClientException extends Exception {
 	 * 
 	 * @param message Error message to include
 	 */
-	public LeadAgentCauClientException(String message) {
+	public PMCertManagerException(String message) {
 		super(message);
 	}
 
@@ -45,7 +45,7 @@ public class LeadAgentCauClientException extends Exception {
 	 * @param message error message {@link String}
 	 * @param cause {@link Throwable cause}
 	 */
-	public LeadAgentCauClientException(String message, Throwable cause) {
+	public PMCertManagerException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
@@ -54,7 +54,7 @@ public class LeadAgentCauClientException extends Exception {
 	 * 
 	 * @param cause {@link Throwable} cause
 	 */
-	public LeadAgentCauClientException(Throwable cause) {
+	public PMCertManagerException(Throwable cause) {
 		super(cause);
 	}
 

@@ -25,6 +25,8 @@ LABEL author="Shirley Crompton" \
 ENV CAU_URL="127.0.0.1:46400"
 # leader CAU ip and port
 ENV LCAU_URL="127.0.0.1:46410"
+# agent type: full/micro, default is full
+ENV AGENT_TYP="full"
 RUN mkdir /var/app
 #for sharing certificate and key with traefik
 RUN mkdir /pkidata
@@ -36,5 +38,5 @@ WORKDIR /var/app
 EXPOSE 46065
 #run the application
 #CMD [ "java", "-jar", "cau-client.jar", $CAU_URL, $LCAU_URL ]
-CMD exec java -jar cau-client.jar ${CAU_URL} ${LCAU_URL}
+CMD exec java -jar cau-client.jar ${CAU_URL} ${LCAU_URL} ${AGENT_TYP}
 

@@ -13,9 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License 
  */
-package eu.mf2c.pm.security.Exception;
+package eu.mf2c.security.Exception;
 /**
- * Errors associated with the {@link eu.mf2c.pm.security.CauClient <em>CauClient</em>} object.
+ * Errors associated with the {@link eu.mf2c.security.cc.StoreManagerSingleton <em>StoreManagerSingleton</em>} object.
  * <p>
  * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
  * org Data Science and Technology Group,
@@ -23,7 +23,7 @@ package eu.mf2c.pm.security.Exception;
  * Date 6 April 2018
  *
  */
-public class CauClientException extends Exception {
+public class StoreManagerSingletonException extends Exception {
 	/**
 	 * unique identifier of this error
 	 */
@@ -34,7 +34,7 @@ public class CauClientException extends Exception {
 	 * 
 	 * @param message Error message to include
 	 */
-	public CauClientException(String message) {
+	public StoreManagerSingletonException(String message) {
 		super(message);
 	}
 
@@ -45,7 +45,7 @@ public class CauClientException extends Exception {
 	 * @param message error message {@link String}
 	 * @param cause {@link Throwable cause}
 	 */
-	public CauClientException(String message, Throwable cause) {
+	public StoreManagerSingletonException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
@@ -54,7 +54,7 @@ public class CauClientException extends Exception {
 	 * 
 	 * @param cause {@link Throwable} cause
 	 */
-	public CauClientException(Throwable cause) {
+	public StoreManagerSingletonException(Throwable cause) {
 		super(cause);
 	}
 

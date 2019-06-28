@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License 
  */
-package eu.mf2c.pm.security;
+package eu.mf2c.security.cc;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,8 +31,8 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.log4j.Logger;
 
-import eu.mf2c.pm.security.Exception.LeadAgentCauClientException;
-import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
+import eu.mf2c.security.Exception.LeadAgentCauClientException;
+import eu.mf2c.security.Exception.StoreManagerSingletonException;
 
 /**
  * A socket client to communicate with the Lead Agent CAU. In IT&#45;1 demo, we
@@ -45,6 +45,7 @@ import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
  *     UKRI Science and Technology Council
  * Date 16 Apr 2018
  */
+@Deprecated
 public class LeadAgentCauClient /*extends Thread*/ {
 	//9May2018 changed to a synchronous call in IT1
 	/** Message logger attribute */

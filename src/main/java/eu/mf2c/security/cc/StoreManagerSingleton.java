@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License 
  */
-package eu.mf2c.pm.security;
+package eu.mf2c.security.cc;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -52,7 +52,7 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
 
-import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
+import eu.mf2c.security.Exception.StoreManagerSingletonException;
 
 /**
  * A singleton class responsible for the trust and key stores.  
@@ -258,8 +258,6 @@ public class StoreManagerSingleton {
 		List<X509Certificate> mylist = new ArrayList<X509Certificate>();
 		mylist.add(cert); //the certificate associated with the private key last (entity cert)
 		mylist.add((X509Certificate) trustStore.getCertificate("ut-sub")); //5July18 - new agent certs issued by untrust
-		//mylist.add((X509Certificate) trustStore.getCertificate("fog-sub"));
-		//mylist.add((X509Certificate) trustStore.getCertificate("00root"));
 		X509Certificate[] chain = (X509Certificate[]) mylist.toArray(new X509Certificate[mylist.size()]);
 		LOGGER.debug("About to store the end-entity cert with the fog ca cert as chain....");
 		//keypass is the passphrase to the cert

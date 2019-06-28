@@ -13,17 +13,17 @@
    See the License for the specific language governing permissions and
    limitations under the License 
  */
-package eu.mf2c.pm.security.Exception;
+package eu.mf2c.security.Exception;
 /**
- * Errors associated with the {@link eu.mf2c.pm.security.BasicSocketServer <em>BasicSocketServer</em>} object.
+ * Errors associated with the {@link eu.mf2c.security.cc.LeadAgentCauClient <em>LeadAgentCauClient</em>} object.
  * <p>
  * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
  * org Data Science and Technology Group,
  *     UKRI Science and Technology Council
- * Date 6 April 2018
+ * Date 9 April 2018
  *
  */
-public class BasicSocketServerException extends Exception {
+public class LeadAgentCauClientException extends Exception {
 	/**
 	 * unique identifier of this error
 	 */
@@ -34,7 +34,7 @@ public class BasicSocketServerException extends Exception {
 	 * 
 	 * @param message Error message to include
 	 */
-	public BasicSocketServerException(String message) {
+	public LeadAgentCauClientException(String message) {
 		super(message);
 	}
 
@@ -45,7 +45,7 @@ public class BasicSocketServerException extends Exception {
 	 * @param message error message {@link String}
 	 * @param cause {@link Throwable cause}
 	 */
-	public BasicSocketServerException(String message, Throwable cause) {
+	public LeadAgentCauClientException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
@@ -54,7 +54,7 @@ public class BasicSocketServerException extends Exception {
 	 * 
 	 * @param cause {@link Throwable} cause
 	 */
-	public BasicSocketServerException(Throwable cause) {
+	public LeadAgentCauClientException(Throwable cause) {
 		super(cause);
 	}
 

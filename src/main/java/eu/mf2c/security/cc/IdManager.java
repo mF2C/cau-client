@@ -13,13 +13,14 @@
    See the License for the specific language governing permissions and
    limitations under the License 
  */
-package eu.mf2c.pm.security;
+package eu.mf2c.security.cc;
 
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
+import eu.mf2c.security.Exception.StoreManagerSingletonException;
+import eu.mf2c.security.util.Properties;
 
 /**
  * Entry point to the application.  This application supports the Agent
@@ -50,9 +51,9 @@ import eu.mf2c.pm.security.Exception.StoreManagerSingletonException;
  *     UKRI Science and Technology Council
  * Date 9 Apr 2018
  */
-public class PMCertManager {
+public class IdManager {
 	//
-	protected static Logger LOGGER = Logger.getLogger(PMCertManager.class);	
+	protected static Logger LOGGER = Logger.getLogger(IdManager.class);	
 	
 	/**
 	 * Retrieve the required Cau IP address.
@@ -65,7 +66,7 @@ public class PMCertManager {
 	 * <p>
 	 * @return a {@link java.lang.String <em>String</em>} representation of the module name.
 	 * @throws StoreManagerSingletonException 
-	 * @throws PMCertManagerException	if no argument or an incorrect name is provided.
+	 * @throws CauClientException	if no argument or an incorrect name is provided.
 	 
 	public String getIPAddr(String moduleName) throws PMCertManagerException {
 		if(moduleName == null || moduleName.isEmpty()) {
@@ -84,6 +85,8 @@ public class PMCertManager {
 	 * @throws StoreManagerSingletonException	on creating the keystore or on loading the certificate PEMs.
 	 */
 	public void setupStoreManager() throws StoreManagerSingletonException {
+		//a keystore is required for the TLS handshake
+		
 		//this creates the keystore, and loads the fog-sub, 01subca and 00root certificate PEMs.
 		StoreManagerSingleton sms = StoreManagerSingleton.getInstance(); 
 		//	
@@ -92,39 +95,37 @@ public class PMCertManager {
 		sms.writeKeyFile();
 	}
 	
-	public void initialise() {
-		
-	}
-	
 	/**
 	 * Entry point to the application.  
-	 * Usage: PMCertManager &#60;CauIP&#91;#58;port number&#93;&#62; &#60;LeaderCauIP&#91;#58;port number&#93;&#62;
+	 * Usage: CauClient &#60;CauIP&#91;#58;port number&#93;&#62; &#60;LeaderCauIP&#91;#58;port number&#93;&#62;
 	 * <p>
 	 * @param args	Application arguments.
 	 * @throws Exception 	on error
 	 */
 	public static void main(String[] args) throws Exception {
-		if (args.length < 2) {
-			throw new RuntimeException("Usage: PMCertManager <CauIP:port number> <LeaderCauIP:port number>");
+		//7June19 added agent type = full or micro
+		if (args.length < 3) {
+			throw new RuntimeException("Usage: CauClient <CauIP:port number> <LeaderCauIP:port number> <AgentType:full/micro>");
 		}
-		if(args[0].isEmpty() || args[1].isEmpty()) {
-			throw new RuntimeException("Usage: PMCertManager <CauIP:port number> <LeaderCauIP:port number>");
+		if(args[0].isEmpty() || args[1].isEmpty() || args[2].isEmpty()) {
+			throw new RuntimeException("Usage: CauClient <CauIP:port number> <LeaderCauIP:port number> <AgentType:full/micro>");
 		}
-		PMCertManager pmCM = new PMCertManager(); //instantiate class
+		IdManager pmCM = new IdManager(); //instantiate class
 		//cache the values now
-		HashMap<String, String> addressesHM = new HashMap<String, String>();
-		addressesHM.put("cauIP", args[0]);
-		addressesHM.put("leaderCauIP", args[1]);
-		LOGGER.debug("Incoming arguments: " + addressesHM.toString());
+		//HashMap<String, String> addressesHM = new HashMap<String, String>();
+		Properties.cauIP = args[0];
+		Properties.leaderCauIP = args[1];
+		Properties.agentType = args[2];
+		LOGGER.debug("Incoming arguments: " + Properties.cauIP + ", " + Properties.leaderCauIP);
 		//bootstrap the storeManager now
 		pmCM.setupStoreManager();
-		//start the server to listen to discovery. 
-		BasicSocketServer bss = new BasicSocketServer(addressesHM);
+		//start the server to listen to triggers. 
+		CauClientServer bss = new CauClientServer();
 		//runs the server which is not threaded.  The control passes to the server.
 		bss.runSocket();		
 		//
-		/*System.exit(0); //9May18 use flag to exit in the BasicSocketServer class and this method returns when 
-		bss.runSocket() returns*/
+		System.exit(0); 
+		
 	}
 
 }
