@@ -32,7 +32,7 @@ import eu.mf2c.security.cc.CCRequestHandler;
  * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
  * org Data Science and Technology Group,
  *     UKRI Science and Technology Council
- * Date 5 Apr 2018
+ * created 5 Apr 2018
  *
  */
 public class Utils {	

@@ -50,9 +50,9 @@ import eu.mf2c.security.util.Properties;
  * provides a method for registering other Agents with the local CIMI.
  * <p> * 
  * @author Shirley Crompton
- * @email shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group, UKRI Science and Technology Council
- * @Created 30 May 2019
+ * email shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group, UKRI Science and Technology Council
+ * Created 30 May 2019
  */
 public class CimiClient {
 	// use this client to register cimi user (leader/child)

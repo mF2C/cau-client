@@ -56,7 +56,7 @@ import static org.junit.Assert.*;
  * email  shirley.crompton@stfc.ac.uk
  * org Data Science and Technology Group,
  *      UKRI Science and Technology Council
- * Created 18 Feb 2019
+ * created 18 Feb 2019
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class WriteCredentials2FileTest {

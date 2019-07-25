@@ -24,10 +24,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Miscellaneous JSON utiltities
  * <p>
  * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
+ * email  shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
  *      UKRI Science and Technology Council
- * @Created 5 Jun 2019
+ * created 5 Jun 2019
  */
 public class JsonUtils {
 	/** Message Logger attribute */

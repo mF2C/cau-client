@@ -57,8 +57,11 @@ import eu.mf2c.security.util.Properties;
  * verify the certificate.
  * <p>
  * 
- * @author Shirley Crompton, shirley.crompton@stfc.ac.uk org Data Science and
- *         Technology Group, UKRI Science and Technology Council Date 5 Apr 2018
+ * @author Shirley Crompton, 
+ * email shirley.crompton@stfc.ac.uk 
+ * org 	Data Science and Technology Group
+ * 		UKRI Science and Technology Council 
+ * created 5 Apr 2018
  *
  */
 public class CauClient {
@@ -160,7 +163,7 @@ public class CauClient {
 		String pem = "";
 		CloseableHttpResponse response1 = null;
 		// https://<ip:port>/cau/publickey?deviceId=<deviceID>
-		HttpGet httpGet = new HttpGet("http://" + Properties.cauIP + Properties.PK + "?deviceid=" + targetDID);
+		HttpGet httpGet = new HttpGet("https://" + Properties.cauIP +  Properties.cauContext + Properties.PK + "?deviceid=" + targetDID);
 		try {
 			this.getCloseableHttpClient();
 			response1 = client.execute(httpGet);
@@ -169,9 +172,10 @@ public class CauClient {
 			if (status >= 200 && status < 300) {
 				//should be a small object
 				pem = EntityUtils.toString(response1.getEntity());
+			}else {
+				throw new Exception("CAU returned error code: " + status);
 			}
-			return pem;
-		} catch (IOException | CauClientException e) {
+		} catch (Exception e) {
 			//
 			throw new CauClientException(e);
 		} finally {
@@ -190,6 +194,7 @@ public class CauClient {
 				}
 			}
 		}
+		return pem;
 	}
 	////////////////////////////////////////////////////////// old code
 
@@ -228,8 +233,7 @@ public class CauClient {
 	 * Run the process to establish a secure TLS connection with the regional CAU.
 	 * Then send a request message for an agent certificate. The certificate is
 	 * written to a shared file volume within the container host.
-	 * <p>
-	 * 
+	 * <p> 
 	 * @throws CauClientException
 	 *             on error
 	 */
@@ -249,7 +253,7 @@ public class CauClient {
 			// get the https client
 			this.getCloseableHttpClient();
 			// prepare the post
-			HttpPost post = new HttpPost("https://" + Properties.cauIP + Properties.CERT); // <host:port>/cau/cert
+			HttpPost post = new HttpPost("https://" + Properties.cauIP + Properties.cauContext + Properties.CERT); // <host:port>/cau/cert
 			post.setEntity(new StringEntity(this.request));
 			LOGGER.debug("About to executive post ...");
 			// Execute HTTP method
@@ -329,14 +333,13 @@ public class CauClient {
 
 	/**
 	 * Read in the CA response as an inputstream object
-	 * <p>
-	 * 
+	 * <p> 
 	 * @param is
 	 *            the response input stream
-	 * @return a {@link java.lang.String <em>String</em>} representation of the
-	 *         X.509 certificate object
-	 * @throws {@link
-	 *             CauClientException <em>CauClientException</em>} on error
+	 * @return a {@link java.lang.String <em>String</em>} representation of the X.509 certificate object
+	 * @throws CauClientException
+	 *             on error
+	 * 
 	 */
 	public String getCertStr(InputStream is) throws CauClientException {
 		String cert = "";
@@ -423,7 +426,7 @@ public class CauClient {
 		String l_deviceId = "deviceID:" + this.deviceID;
 		String l_leaderId = "detectedLID:" + this.leaderID;
 		// String l_leaderIP = "detectedLIP:" + this.leaderIP;
-		String l_idKey = "IDkey:" + this.idKey;
+		String l_idKey = "IDKey:" + this.idKey;
 		// String l_aType = "type:" + Properties.agentType;
 		//
 		// 9May2018 removed base64 encoding

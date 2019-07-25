@@ -9,6 +9,9 @@ src/main/resources/cau.key.pem
 
 
 
+#old javadoc
+/doc/
+
 /bin/
 
 /mF2C-cau-client.log
@@ -18,3 +21,9 @@ src/main/resources/cau.key.pem
 /mF2Cjks.jks
 
 /target/
+archive-tmp/
+/target/*classes/
+/target/generated-sources/
+/target/javadoc-bundle-options/
+/target/maven-*/
+/target/*.jar

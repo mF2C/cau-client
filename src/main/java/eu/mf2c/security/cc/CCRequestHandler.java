@@ -36,10 +36,10 @@ import eu.mf2c.security.cc.cimi.*;
  * A threaded handler to handle calls to the {@link CauClientServer <em>BasicSocketServer</em>}
  * <p>
  * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
+ * email  shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
  *      UKRI Science and Technology Council
- * @Created 29 May 2019
+ * Created 29 May 2019
  */
 public class CCRequestHandler extends Thread {
 	/** Message logger attribute */
@@ -49,7 +49,7 @@ public class CCRequestHandler extends Thread {
 	/** request parameters */
 	private Map<String, String> params = null;
 	/** request operation flag */
-	private int op = 0; //1=getpubkey, 2=adduser, 3=getCSR
+	private int op = 0; //1=getpubkey, 2=adduser, 3=getCSR //23July19 adduser obsolete
 	/**
 	 * Constructor
 	 * <p>

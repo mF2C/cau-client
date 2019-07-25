@@ -32,11 +32,11 @@ import eu.mf2c.security.cc.StoreManagerSingleton;
  * Test generating a CSR {@link java.lang.String <em>String</em>}
  * <p>
  * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
+ * email  shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
  *      UKRI Science and Technology Council
- * @Created 30 May 2019
- * <p>
+ * created 30 May 2019
+ * 
  */
 @Ignore
 public class CSRtest {

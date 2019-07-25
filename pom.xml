@@ -193,9 +193,9 @@
 								<link>http://docs.oracle.com/javase/8/docs/api/</link>
 							</links>
 							<show>private</show>
-							<reportOutputDirectory>${project.build.directory}</reportOutputDirectory>
-							<!-- <reportOutputDirectory>>${project.basedir}/doc</reportOutputDirectory> 
-								<destDir>javadoc</destDir> -->
+							<!-- <reportOutputDirectory>${project.build.directory}</reportOutputDirectory>-->
+							<reportOutputDirectory>${project.basedir}</reportOutputDirectory> 
+							<destDir>javadoc</destDir>
 						</configuration>
 					</execution>
 				</executions>
@@ -216,9 +216,10 @@
 							<archive>
 								<manifest>
 									<addClasspath>true</addClasspath>
-									<mainClass>eu.mf2c.security.IdManager</mainClass>
+									<mainClass>eu.mf2c.security.cc.IdManager</mainClass>
 								</manifest>
 							</archive>
+							<outputDirectory>${project.basedir}</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>

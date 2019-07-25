@@ -20,7 +20,7 @@ package eu.mf2c.security.Exception;
  * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
  * org Data Science and Technology Group,
  *     UKRI Science and Technology Council
- * Date 6 April 2018
+ * created 6 April 2018
  *
  */
 public class StoreManagerSingletonException extends Exception {

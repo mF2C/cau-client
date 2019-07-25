@@ -103,20 +103,20 @@ public class IdManager {
 	 * @throws Exception 	on error
 	 */
 	public static void main(String[] args) throws Exception {
-		//7June19 added agent type = full or micro
-		if (args.length < 3) {
-			throw new RuntimeException("Usage: CauClient <CauIP:port number> <LeaderCauIP:port number> <AgentType:full/micro>");
+		//
+		if (args.length < 2) {
+			throw new RuntimeException("Usage: CauClient <CloudCauIP:port number> <CauIP:port number>" /*<AgentType:full/micro>"*/);
 		}
-		if(args[0].isEmpty() || args[1].isEmpty() || args[2].isEmpty()) {
-			throw new RuntimeException("Usage: CauClient <CauIP:port number> <LeaderCauIP:port number> <AgentType:full/micro>");
+		if(args[0].isEmpty() || args[1].isEmpty() /* || args[2].isEmpty()*/) {
+			throw new RuntimeException("Usage: CauClient <CloudCauIP:port number> <CauIP:port number>" /* <AgentType:full/micro>"*/);
 		}
 		IdManager pmCM = new IdManager(); //instantiate class
 		//cache the values now
 		//HashMap<String, String> addressesHM = new HashMap<String, String>();
 		Properties.cauIP = args[0];
-		Properties.leaderCauIP = args[1];
-		Properties.agentType = args[2];
-		LOGGER.debug("Incoming arguments: " + Properties.cauIP + ", " + Properties.leaderCauIP);
+		Properties.cloudCauIP = args[1];
+		//Properties.agentType = args[2];
+		LOGGER.debug("Incoming arguments: " + Properties.cauIP + ", " + Properties.cloudCauIP);
 		//bootstrap the storeManager now
 		pmCM.setupStoreManager();
 		//start the server to listen to triggers. 

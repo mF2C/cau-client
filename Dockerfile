@@ -21,22 +21,25 @@ LABEL author="Shirley Crompton" \
       eu.mf2c-project.version="0.0.1-beta" \
       eu.mf2c-project.version.is-production="false" 
 #
-# regional CAU ip and port
-ENV CAU_URL="127.0.0.1:46400"
-# leader CAU ip and port
-ENV LCAU_URL="127.0.0.1:46410"
+# cloud CAU ip and port
+ENV CCAU_URL="213.205.14.13:55443"
+# local CAU ip and port, we use service/container name as the ip
+#docker cloud
+#ENV CAU_URL="cau:55443"
+#standalone, use cloud CAU for the moment
+ENV CAU_URL="213.205.14.13:55443" 
 # agent type: full/micro, default is full
-ENV AGENT_TYP="full"
+#ENV AGENT_TYP="full"
 RUN mkdir /var/app
 #for sharing certificate and key with traefik
 RUN mkdir /pkidata
 VOLUME /pkidata
 #
-ADD cau-client.jar /var/app/cau-client.jar
+ADD mf2c-cauclient-jar-with-dependencies.jar /var/app/cau-client.jar
 WORKDIR /var/app
 # 
 EXPOSE 46065
 #run the application
-#CMD [ "java", "-jar", "cau-client.jar", $CAU_URL, $LCAU_URL ]
-CMD exec java -jar cau-client.jar ${CAU_URL} ${LCAU_URL} ${AGENT_TYP}
+CMD [ "java", "-jar", "cau-client.jar", $CCAU_URL, $CAU_URL ]
+#CMD exec java -jar cau-client.jar ${CAU_URL} ${LCAU_URL} ${AGENT_TYP}
 

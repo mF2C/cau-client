@@ -23,10 +23,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * :todo this needs to be replaced with the new template being developed by SixQ
  * <p>
  * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
+ * email  shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
  *      UKRI Science and Technology Council
- * @Created 30 May 2019
+ * created 30 May 2019
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CimiUserTemplate {
@@ -77,9 +77,9 @@ public class CimiUserTemplate {
 	 * Nested class containing details of the CIMI user
 	 * <p>
 	 * @author Shirley Crompton
-	 * @email shirley.crompton@stfc.ac.uk
-	 * @org Data Science and Technology Group, UKRI Science and Technology Council
-	 * @Created 30 May 2019
+	 * email shirley.crompton@stfc.ac.uk
+	 * org Data Science and Technology Group, UKRI Science and Technology Council
+	 * created 30 May 2019
 	 */
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class CimiUser {
@@ -123,7 +123,7 @@ public class CimiUserTemplate {
 		/**
 		 * Setter for the CIMI href attribute
 		 * 
-		 * @param href
+		 * @param href path segment 
 		 */
 		public void setHref(String href) {
 			this.href = href;

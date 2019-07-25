@@ -125,6 +125,7 @@ public class CauClientServer {
         	}
         }catch(Exception e){
         	//this.isRunning = false; //30May19 keeps server going 
+        	//Ctrl-C to stop server got handled here so a misleading err4 24July 2019
         	String errMsg = "err4 : " + (e.getMessage() == null ? " unknown error " : e.getMessage());
         	LOGGER.error(errMsg);
         }

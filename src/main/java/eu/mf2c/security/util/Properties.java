@@ -19,25 +19,26 @@ package eu.mf2c.security.util;
  * Configuration properties.
  * <p>
  * @author Shirley Crompton
- * @email  shirley.crompton@stfc.ac.uk
- * @org Data Science and Technology Group,
+ * email  shirley.crompton@stfc.ac.uk
+ * org Data Science and Technology Group,
  *      UKRI Science and Technology Council
- * @Created 31 May 2019
+ * created 31 May 2019
  */
 public class Properties {
 	
 	
 	///////////////////////////////////CAU-related/////////////////////////////////////
 	/** IP of the local CAU */	//default from docker file
-	public static String cauIP = "127.0.0.1:46400/cau"; 
-	/** IP of the leader CAU */  //default from docker file TODO not sure if this is still relevant
-	public static String leaderCauIP = "127.0.0.1:46410";
-	/** IP of the Leader */
-	public static String LeaderIP = "http://example.host/api"; //this is for registering CIMI user 
+	public static String cauIP = "127.0.0.1:55443"; 
+	/** IP of the cloud CAU   //default from docker file TODO not sure if this is still relevant
+	public static String CloudCauIP = "127.0.0.1:46410"; */
+	public static String cauContext = "/cau";
+	/** IP of the Leader
+	public static String LeaderIP = "http://example.host/api"; //this is for registering CIMI user  */
 	/** IP of the cloud CAU, this offers a fall back if the others are not available */
-	public static String cloudCAUIP = "";  //e.g. https://dashboard.mf2c-project.eu/
-	/** Agent Type which can be either full or micro */
-	public static String agentType = "full"; //default to full, from docker file
+	public static String cloudCauIP = "213.205.14.13:55443";  //e.g. https://dashboard.mf2c-project.eu/
+	/** Agent Type which can be either full or micro 
+	public static String agentType = "full"; //default to full, from docker file*/
 	/** CAU Rest service path for retrieving a public key by device id */
 	public static final String PK = "/publickey"; //resource element for public key 
 	/** CAU Rest service path for requesting an Agent certificate */
