@@ -489,7 +489,7 @@ public class StoreManagerSingleton {
 				LOGGER.info("device id file exists already, not over-writing it.....");
 				return;
 			}		
-			Files.write(Paths.get("c:/output.txt"), did.getBytes());
+			Files.write(Paths.get(didFile), did.getBytes());
 		} catch (IOException e) {
 			// 
 			throw new StoreManagerSingletonException(e);
