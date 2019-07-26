@@ -25,9 +25,9 @@ LABEL author="Shirley Crompton" \
 ENV CCAU_URL="213.205.14.13:55443"
 # local CAU ip and port, we use service/container name as the ip
 #docker cloud
-ENV CAU_URL="cau-stfc1:55443"
+#ENV CAU_URL="cau-stfc1:55443"
 #standalone, use cloud CAU for the moment
-#ENV CAU_URL="213.205.14.13:55443" 
+ENV CAU_URL="213.205.14.13:55443" 
 RUN mkdir /var/app
 #for sharing certificate and key with traefik
 RUN mkdir /pkidata
@@ -38,5 +38,5 @@ WORKDIR /var/app
 # 
 EXPOSE 46065
 #run the application
-CMD exec java -jar cau-client.jar ${CAU_URL} ${LCAU_URL}
+CMD exec java -jar cau-client.jar ${CAU_URL} ${CCAU_URL}
 
