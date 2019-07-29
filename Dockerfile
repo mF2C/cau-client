@@ -13,13 +13,19 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License 
 #############################################################################
-#use apline base image, Oracle one has problem with licence
+#use alpine base image, Oracle one has problem with licence
+#alpine adapts to docker built platform
 FROM openjdk:8-jdk-alpine
 #
 LABEL author="Shirley Crompton" \
       vendor="UK RI STFC" \
       eu.mf2c-project.version="0.0.1-beta" \
       eu.mf2c-project.version.is-production="false" 
+      
+#RPI may not have netcat installed      
+#RUN apt-get update
+#RUN apt-get install netcat
+      
 #
 # cloud CAU ip and port
 ENV CCAU_URL="213.205.14.13:55443"

@@ -197,6 +197,7 @@ public class CCRequestHandler extends Thread {
 			op = 3;
 			//IDkey=someIDKey,(leaderIP=http://..., NOT REQUIRED)detectedLeaderID=leaderDeviceID,deviceID=AgentDeviceID
 			//idkey : (leaderip : NOT REQUIRED)	leaderid  : deviceid 
+			System.out.println("request handler about to call register Agent.....");
 			this.registerAgent();
 		}
 		return result;
@@ -216,7 +217,8 @@ public class CCRequestHandler extends Thread {
 		/*The CAU-client creates the CSR and then call the CAU to: validate IdKey (for full agent), get CA to sign CSR  
 		 * and register this Agent in Leader's CIMI (for full agent).  On CAU returns, the CAU client gets 
 		 * AgentSingleton to store credentials than writes the credentials to pkidata*/
-		try {			
+		try {	
+			System.out.println("about to instantiate CauClient....");
 			CauClient client = new CauClient(this.params);
 			client.getCert(); //if it fails, you get an exception
 			
