@@ -15,17 +15,13 @@
  */
 package eu.mf2c.security.cc;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-import eu.mf2c.security.Exception.CauClientServerException;
 import eu.mf2c.security.Exception.StoreManagerSingletonException;
 
 /**
@@ -35,10 +31,7 @@ import eu.mf2c.security.Exception.StoreManagerSingletonException;
  * <ul>
  * <li>get a new Agent certificate</li>
  * <li>get an Agent Public Key identified by a device id.</li>
- * <li>register an internal user on the local CIMI instance.</li>
  * </ul>
- * The request is handled synchronously and the server returns
- * either an error message or an OK message.
  * <p>
  * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
  * org Data Science and Technology Group,
@@ -69,9 +62,8 @@ public class CauClientServer {
     
     
     /**
-     * Runs a basic TCP&#47;IP socket server to listen for
-     * trigger from the Discovery block and receive the required
-     * identity and leader information.
+     * Runs a basic TCP&#47;IP socket server to listen 
+	 * to request messages
      * <p> 
      * @throws Exception on processing errors
      */

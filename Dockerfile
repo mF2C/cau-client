@@ -19,7 +19,7 @@ FROM openjdk:8-jdk-alpine
 #
 LABEL author="Shirley Crompton" \
       vendor="UK RI STFC" \
-      eu.mf2c-project.version="0.0.1-beta" \
+      eu.mf2c-project.version="2.1" \
       eu.mf2c-project.version.is-production="false" 
       
 #RPI may not have netcat installed      

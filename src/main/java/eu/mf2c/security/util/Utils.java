@@ -143,7 +143,7 @@ public class Utils {
      */
     public static Map<String, String> getValues(String message) {
     	//tokenise message, for legacy reason, the getCSR request is different from those for registerUser and getPK requests
-    	//E.g.: "detectedLeaderID=56789,deviceID=123456789,IDkey=someIDKey,leaderIP=IPString"
+    	//E.g.: "detectedLeaderID=56789,deviceID=123456789
     	
     	//register user :  adduser=agentdeviceid
     	//get public key : getpubkey=agentdeviceid
@@ -152,7 +152,7 @@ public class Utils {
     	String[] msgList = message.split(",");
     	for (String entry : msgList) {
     		  String[] keyValue = entry.split("=");
-    		  map.put(keyValue[0],keyValue[1]);    		  
+    		  map.put(keyValue[0],keyValue[1]); //empty value is not appended!!!  
     	}
     	map.forEach((k,v)->LOGGER.debug(k + " : " + v));
     	return map;

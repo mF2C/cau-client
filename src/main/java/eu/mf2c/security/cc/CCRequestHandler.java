@@ -107,7 +107,7 @@ public class CCRequestHandler extends Thread {
 					LOGGER.error("Error handling request : " + msg);
 					//
 					String errCode = "err4"; //default to other errors
-					//
+					//err3 is obsolete as we don't register CIMI user
 					if (msg.startsWith("Error registering CIMI user")) {
 						errCode = "err3";
 					} else if (msg.startsWith("Error getting public key")) {
@@ -179,26 +179,18 @@ public class CCRequestHandler extends Thread {
 		if(this.params.isEmpty()) {  //Utils instantiates the Map
 			throw new CauClientException("Failed to extract parameters from request message!  Cannot proceed!");
 		}
-		//three type of requests
-		if(this.params.size()==1) {
-			//either adduser or getpubkey
-			if(this.params.containsKey("getpubkey")) {
-				op = 1;
-				result = this.getPubKey(this.params.get("getpubkey"));
-			}else if(this.params.containsKey("adduser")) {
-				op = 2;
-				//this.registerUser(this.params.get("adduser"));
-				//19June19 apparently we don't need to register a CIMI user
-				result = "deprecated operation";
-			}			
-		}
-		if(this.params.size()==3) {//legacy call  -- 26June2019 don't need leader IP as we don't need to create CIMI user 
-			//micro-agent does not run CIMI, we just need to get a cert for it
+		//two type of requests
+		if(this.params.containsKey("getpubkey")) {		
+			op = 1;
+			result = this.getPubKey(this.params.get("getpubkey"));					
+		}else if(this.params.containsKey("deviceID")) {		
 			op = 3;
 			//IDkey=someIDKey,(leaderIP=http://..., NOT REQUIRED)detectedLeaderID=leaderDeviceID,deviceID=AgentDeviceID
 			//idkey : (leaderip : NOT REQUIRED)	leaderid  : deviceid 
-			System.out.println("request handler about to call register Agent.....");
+			LOGGER.debug("request handler about to call register Agent.....");
 			this.registerAgent();
+		}else {
+			LOGGER.error("Unknown requests!");
 		}
 		return result;
 	}	
@@ -206,19 +198,17 @@ public class CCRequestHandler extends Thread {
 	////////////////////////////////////private methods to handle the request////////////
 	
 	/**
-	 * This handles the IT1 call to register an Agent.  The process includes&#58;
-	 * <ul>
-	 * <li>calling the CAU client to get a certificate</li>
-	 * <li>registering the leader Agent as a CIMI user locally</li>
-	 * </ul>
+	 * This handles the IT2 call to register an Agent.  The process procures an mF2C Agent
+	 * certificate from the cloud CA using a local CAU service.
+	 * <p>
 	 * @throws CauClientException	on error
 	 */
 	private void registerAgent() throws CauClientException {
-		/*The CAU-client creates the CSR and then call the CAU to: validate IdKey (for full agent), get CA to sign CSR  
-		 * and register this Agent in Leader's CIMI (for full agent).  On CAU returns, the CAU client gets 
+		/*The CAU-client creates the CSR and then call the CAU to get CA to sign CSR.  
+		 * On CAU returns, the CAU client gets 
 		 * AgentSingleton to store credentials than writes the credentials to pkidata*/
 		try {	
-			System.out.println("about to instantiate CauClient....");
+			//System.out.println("about to instantiate CauClient....");
 			CauClient client = new CauClient(this.params);
 			client.getCert(); //if it fails, you get an exception
 			

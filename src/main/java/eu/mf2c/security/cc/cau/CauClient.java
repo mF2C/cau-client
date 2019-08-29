@@ -51,12 +51,9 @@ import eu.mf2c.security.cc.StoreManagerSingleton;
 import eu.mf2c.security.util.Properties;
 
 /**
- * A socket client to communicate with the regional CAU and obtain an agent
- * certificate. In IT&#45;1&#58; after obtaining the certificate from the fog CA
- * via the regional CAU, it will perform a SSL handshake with the leader CAU to
- * verify the certificate.
+ * A socket client to communicate with a CAU to an agent or
+ * query for an Agent&#39;s public key using its deviceID.
  * <p>
- * 
  * @author Shirley Crompton, 
  * email shirley.crompton@stfc.ac.uk 
  * org 	Data Science and Technology Group
@@ -71,13 +68,13 @@ public class CauClient {
 	// we need 2 methods:
 	// 1) getPublicKey(deviceID) 2) getCert(csr.....) IT1 method
 	protected Logger LOGGER = Logger.getLogger(CauClient.class);
-	/** ssl context attribute */
-	private SSLContext sslContext = null;
+	/** ssl context attribute 
+	private SSLContext sslContext = null;*/
 	/**
 	 * ssl socket factory attribute private SSLSocketFactory sslFactory = null;
 	 */
-	/** ssl socket object */
-	private SSLSocket socket = null;
+	/** ssl socket object 
+	private SSLSocket socket = null;*/
 	/**
 	 * The next four attributes are passed in as main arguments (June19 these are
 	 * stored in Properties)
@@ -94,8 +91,8 @@ public class CauClient {
 	/**
 	 * lead agent IP address attribute / private String leaderIP = null;* /** user
 	 * ID key
-	 */
-	private String idKey = null;
+	 
+	private String idKey = null;*/
 	/** agent device ID */
 	private String deviceID = null;
 	/** certificate signing request */
@@ -149,15 +146,15 @@ public class CauClient {
 	 * Call the CAU to retrieve the public key associated with the provided Agent
 	 * identifier.
 	 * <p>
-	 * 
 	 * @param targetDID
 	 *            a {@link java.lang.String <em>String</em>} representation of the
 	 *            unique Agent identifier
-	 * @return the retrieved public key in PEM formet
+	 * @return the retrieved public key in PEM format
 	 * @throws CauClientException
 	 *             on processing error
 	 */
 	public String getPublicKey(String targetDID) throws CauClientException {
+		LOGGER.debug("CauClient.getPublicKey method called ....");
 		this.op = 1;
 		// get a PEM format of device id
 		String pem = "";
@@ -212,21 +209,11 @@ public class CauClient {
 		// we need to escalate exceptions to the parent, do these now before starting
 		// the thread
 		// extract the connection params now
-		/*
-		 * these are now stored in Properties this.cauIP =
-		 * Utils.getInetAddress(Properties.cauIP); if(Properties.cauIP.contains(":")) {
-		 * this.cauPort = Utils.getPortNum(Properties.cauIP); } this.leaderCauIP =
-		 * Utils.getInetAddress(Properties.leaderCauIP);
-		 * if(Properties.leaderCauIP.contains(":")) { this.leaderCauPort =
-		 * Utils.getPortNum(Properties.leaderCauIP); }
-		 */
-		this.idKey = params.get("IDkey");
-		// this.leaderIP = params.get("leaderIP");
 		this.deviceID = params.get("deviceID");
 		this.leaderID = params.get("detectedLeaderID"); // if agent is leader leaderID=deviceID
 		// this.createSSLContext();
-		LOGGER.debug("Got IDkey: " + this.idKey + /* ", leaderIP: " + this.leaderIP + */", deviceID: " + this.deviceID
-				+ ", leaderID: ");
+		LOGGER.debug(/*"Got IDkey: " + this.idKey +  ", leaderIP: " + this.leaderIP + */"Got deviceID: " + this.deviceID
+				+ ", leaderDID: " + (this.leaderID == null ? "null" : this.leaderID));
 	}
 
 	/**
@@ -255,10 +242,10 @@ public class CauClient {
 			// prepare the post
 			HttpPost post = new HttpPost("https://" + Properties.cauIP + Properties.cauContext + Properties.CERT); // <host:port>/cau/cert
 			post.setEntity(new StringEntity(this.request));
-			LOGGER.debug("About to executive post ...");
+			//LOGGER.debug("About to executive post ...");
 			// Execute HTTP method
 			res = this.client.execute(post);
-			LOGGER.debug("About to verify response ....");
+			//LOGGER.debug("About to verify response ....");
 			// Verify response
 			LOGGER.debug(res.getStatusLine().getReasonPhrase());
 			int status = res.getStatusLine().getStatusCode();
@@ -276,20 +263,13 @@ public class CauClient {
 					// System.out.println("About to get content as stream...");
 					LOGGER.debug("About to get content as stream...");
 					certString = getCertStr(res.getEntity().getContent());
-				}
-				/*
-				 * BufferedReader br; br = new BufferedReader(new
-				 * InputStreamReader(res.getEntity().getContent())); String line = ""; while
-				 * ((line = br.readLine()) != null) { certString += line; }
-				 */
+				}				
 				if (certString == null || certString.isEmpty()) {
 					throw new CauClientException("Error posting for a certificate! null/empty response!");
 				} else {
 					LOGGER.debug("CAU returns : " + (certString != null ? certString : "NULL"));
 				}
-			} else {
-				// LOGGER.error("Error posting user : " +
-				// res.getStatusLine().getReasonPhrase());
+			} else {				
 				throw new Exception("Error posting csr : " + res.getStatusLine().getReasonPhrase());
 			}
 		} catch (Exception e) {
@@ -326,7 +306,6 @@ public class CauClient {
 			//
 			StoreManagerSingleton.getInstance().writeDeviceID(this.deviceID); // added 30 April 2019
 		} catch (StoreManagerSingletonException | KeyStoreException e) {
-			// TODO Auto-generated catch block
 			throw new CauClientException("Error creating/writing cert: " + e.getMessage());
 		}
 	}
@@ -395,7 +374,7 @@ public class CauClient {
 			this.client = HttpClients.custom().setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE). // turn off
 																										// hostname
 																										// verification
-					setSSLContext(sslContext). // set context and trust all cert
+					setSSLContext(sslContext). // set context 
 					setDefaultHeaders(getHeadersAsList()). // set headers
 					build();
 		} catch (Exception e) {
@@ -421,19 +400,16 @@ public class CauClient {
 	 * Create the CAU request message
 	 */
 	private void getRequestMsg() {
-		// csr=csrContentAsString,IDkey=someIDKey,MACaddr=ab:cd:ef:01:23:45,detectedLeaderID=56789,deviceID=123456789
+		// csr=csrContentAsString,detectedLeaderID=56789,deviceID=123456789
 		// 27June2019 changed = to :
 		String l_deviceId = "deviceID:" + this.deviceID;
 		String l_leaderId = "detectedLID:" + this.leaderID;
-		// String l_leaderIP = "detectedLIP:" + this.leaderIP;
-		String l_idKey = "IDKey:" + this.idKey;
-		// String l_aType = "type:" + Properties.agentType;
 		//
 		// 9May2018 removed base64 encoding
 		// return Base64.getEncoder().encode(("csr=" + csrString + "," + l_leaderId +
 		// "," + l_leaderMacAddr + "," + l_idKey + "," + l_deviceId).getBytes());
-		this.request = (/* l_aType + ", */"csr:" + this.csr + "," + l_leaderId + "," + /* l_leaderIP + "," + */l_idKey
-				+ "," + l_deviceId);
+		this.request = (/* l_aType + ", */"csr:" + this.csr + "," + l_leaderId + "," + /* l_leaderIP + "," + l_idKey
+				+ "," +*/ l_deviceId);
 		LOGGER.debug("The request msg: " + this.request);
 	}
 
@@ -458,6 +434,7 @@ public class CauClient {
 	 * @param session
 	 *            the current session object
 	 */
+	@SuppressWarnings("unused")
 	private void logSesisonInfo(SSLSession session) {
 		try {
 			java.security.cert.Certificate[] cchain = session.getPeerCertificates();

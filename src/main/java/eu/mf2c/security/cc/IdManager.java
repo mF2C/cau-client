@@ -24,27 +24,34 @@ import eu.mf2c.security.util.Properties;
 
 /**
  * Entry point to the application.  This application supports the Agent
- * registration process.
+ * registration and token en&#47;de&#45;cryption processes
  * <p>
- * In IT&#45;1, it needs to be started with the following arguments&#58;
+ * In IT&#45;2, it needs to be started with the following arguments&#58;
  * <ul>
  * <li>CauIP</li>
  * <li>LeaderCauIP</li>
  * </ul>
  * This application runs a basic TCP&#45;IP socket server
- * to listen to the trigger from the Discovery block.  The latter will provide 
- * the following mandatory parameters in a &#59;&#45;separated String&#58;
+ * to listen to UTF8 encoded plain text request messages from other agent blocks.  
+ * <p>
+ * For the agent registration process, the Policy block sends a request 
+ * message with these mandatory parameters as a comma&#45;separated String&#58;
  * <ul>
- * <li>leaderID&#61;&#60;ExampleString&#62;</li>
- * <li>LeaderMacAddr&#61;&#60;ExampleString&#62;</li>
- * <li>idKey&#61;&#60;ExampleString&#62;</li>
- * <li>deviceId&#61;&#60;ExampleString&#62;</li>
+ * <li>detectedLeaderID&#61;leaderDeviceIDValue</li>
+ * <li>deviceID&#61;agentDeviceIdValue</li>
  * </ul>
- * On receiving the trigger, the application will connect via TLS to the local
- * CAU to request an agent certificate signed by the cloud CA.
- * Then it performs a handshake with the leader agent to validate the new certificate.
- * After which, it contacts the Categorisation block via ReST to initiate the agent 
- * categorisation process.
+ * On receiving the trigger, the application generates a CSR which it sends to
+ * a CAU via TLS to request an agent certificate from the cloud CA.  On receipt
+ * of the signed certificate, the application writes the certificate and the
+ * agent&#39;s deviceID to the local docker volume for sharing with other agent
+ * blocks and returns an &#34;OK&#34; response message to the client.
+ * <p>
+ * For getting an Agent&#39;s public key to support the token en&#47;de&#45;cryption process,
+ * a client sends the Agent&#39;s deviceID in a request message&#58;
+ * <ul>
+ * <li>getPubKey&#61;deviceIDValue</li>
+ * </ul>
+ * The application contacts a CAU to retrieve the public key.
  * <p>
  * @author Shirley Crompton, shirley.crompton@stfc.ac.uk
  * org Data Science and Technology Group,
