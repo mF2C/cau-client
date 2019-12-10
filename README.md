@@ -74,4 +74,9 @@ Rewritten from IT1 version.  CAU-Client now runs a TCP-server to listen to reque
  - removed the IDKey parameter for the get cert operation.  Identification block validates this IDKey upstream.
  - removed commented out redundant code
  - updated code comments for Javadoc
+ 
+### 2.2 (10/12/2019)
+
+#### Changed
+ - Updated Apache Http client to use TLS v1.2.
 
