@@ -14,7 +14,7 @@ The CAU-client runs a TCP server at <host>:46065
 
 The CAU-client offers two functions:
 
-* get Agent certificate - during the Agent initialisation phase, the Policy block (in a full Agent) or the initialisation script (in a micro Agent) uses this function to obtain an Agent certificate from the mF2C Trusted CA service.  The function takes in three arguments: 
+* get Agent certificate - during the Agent initialisation phase, the Policy block (in a full Agent) or the initialisation script (in a micro Agent) uses this function to obtain an Agent certificate from the mF2C Trusted CA service.  The function takes in two arguments: 
 
 	- the new Agent's device ID, 
 	- the detected Leader's device ID  
@@ -23,7 +23,7 @@ Here is an example request message which needs to be UTF-8 encoded and terminate
 
 	detectedLeaderID=0f848d8fb78cbe5615507ef5a198f660ac89a3ae03b95e79d4ebfb3466c20d54e9a5d9b9c41f88c782d1f67b32231d31b4fada8d2f9dd31a4d884681b784ec5a,deviceID=c6968d75a7df20e2d2f81f87fe69bf0b7dd14f4a22cca5f15ffc645cb4d45944bfdc7a7a970a9e13a331161e304a3094d8e6e362e88bd7df0d7b5473b6d2aa80
 
-The CAU-Client generates an RSA keypair (2048 length) and uses it to build a Certificate Signing Request (CSR) which it sends to the CAU together with the three arguments.  The CAU first validates the IDKey against the mF2C Cloud CIMI instance before getting the CA to sign the CSR.  The CAU-Client, on receiving the signed certificate, stores this locally within the Agent before returning an 'OK' message to the caller.  The Agent certificate is used by other Agent blocks as a credential, e.g. as the server certificate by Traefik, for SSL handshake by the VPN-client.
+The CAU-Client generates an RSA keypair (2048 length) and uses it to build a Certificate Signing Request (CSR) which it sends to the CAU together with the two arguments.  The CAU, in turn, gets the CA to sign the CSR.  The CAU-Client, on receiving the signed certificate, stores this locally within the Agent before returning an 'OK' message to the caller.  The Agent certificate is used by other Agent blocks as a credential, e.g. as the server certificate by Traefik, for SSL handshake by the VPN-client.
 
 * get Agent public key - The public key associated with the Agent's certificate is used by the [ACLib](https://github.com/mF2C/aclib) block to implement policy based data security and to create/validate identity token for authenticating an Agent's identity.  The function takes in an Agent's device ID which the CAU-Client sends to the CAU middleware to get the associated public key.  Here is an example request message which needs to be UTF-8 encoded and terminates with an \n:
 

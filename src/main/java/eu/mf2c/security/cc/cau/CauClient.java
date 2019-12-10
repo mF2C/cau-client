@@ -34,10 +34,12 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 
 import org.apache.http.Header;
+import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -213,7 +215,7 @@ public class CauClient {
 		this.leaderID = params.get("detectedLeaderID"); // if agent is leader leaderID=deviceID
 		// this.createSSLContext();
 		LOGGER.debug(/*"Got IDkey: " + this.idKey +  ", leaderIP: " + this.leaderIP + */"Got deviceID: " + this.deviceID
-				+ ", leaderDID: " + (this.leaderID == null ? "null" : this.leaderID));
+				+ ", leaderLID: " + (this.leaderID == null ? "null" : this.leaderID));
 	}
 
 	/**
@@ -242,6 +244,7 @@ public class CauClient {
 			// prepare the post
 			HttpPost post = new HttpPost("https://" + Properties.cauIP + Properties.cauContext + Properties.CERT); // <host:port>/cau/cert
 			post.setEntity(new StringEntity(this.request));
+			//post.setProtocolVersion(HttpVersion.);
 			//LOGGER.debug("About to executive post ...");
 			// Execute HTTP method
 			res = this.client.execute(post);
@@ -365,18 +368,34 @@ public class CauClient {
 		LOGGER.debug("about to create closeable http client ...");
 		try {
 			SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+					.setProtocol("TLSv1.2")
 					.loadTrustMaterial(StoreManagerSingleton.getInstance().getTrustStore(),
 							new org.apache.http.conn.ssl.TrustSelfSignedStrategy())
 					.setKeyStoreType("JKS").loadKeyMaterial(StoreManagerSingleton.getInstance().getKeyStore(),
 							StoreManagerSingleton.getInstance().getStorePass().toCharArray())
 					.build();
 			LOGGER.debug("about to build http client ...");
+			/* 5Dec2019 fix for connection issue with CAU		 
 			this.client = HttpClients.custom().setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE). // turn off
 																										// hostname
 																										// verification
 					setSSLContext(sslContext). // set context 
 					setDefaultHeaders(getHeadersAsList()). // set headers
 					build();
+					*/
+			// force the use of TLS1.2
+			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+	                sslContext,
+	                new String[] { "TLSv1.2" }, //protocols
+	                null, //ciphers
+	                NoopHostnameVerifier.INSTANCE);
+			// turn off hostname verification
+			this.client = HttpClients.custom()
+					.setSSLSocketFactory(sslsf) 
+					.setDefaultHeaders(getHeadersAsList()) // set headers
+					.build();
+			////////////end 5Dec2019 fix
+			
 		} catch (Exception e) {
 			throw new CauClientException(e);
 		}

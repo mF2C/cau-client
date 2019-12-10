@@ -29,7 +29,7 @@ public class Properties {
 	
 	///////////////////////////////////CAU-related/////////////////////////////////////
 	/** IP of the local CAU */	//default from docker file
-	public static String cauIP = "127.0.0.1:55443"; 
+	public static String cauIP = "213.205.14.13:55443"; 
 	/** IP of the cloud CAU   //default from docker file TODO not sure if this is still relevant
 	public static String CloudCauIP = "127.0.0.1:46410"; */
 	public static String cauContext = "/cau";
